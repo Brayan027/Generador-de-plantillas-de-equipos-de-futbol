@@ -77,6 +77,117 @@ function clearDataBoxTxbx() {
 }
 
 /**
+ * Limpia y preprocesa automáticamente fotos problemáticas:
+ * 1. Respeta rotación EXIF natural (.rotate()).
+ * 2. Si la foto es una foto física tomada sobre una mesa/superficie oscura, recorta automáticamente el recuadro del carnet.
+ * 3. Si la foto es una captura de pantalla (con franjas negras arriba/abajo, hora, batería, etc.), las recorta automáticamente.
+ */
+async function autoPreprocessPhoto(rawBuffer) {
+    if (!rawBuffer) return rawBuffer;
+    try {
+        let image = sharp(rawBuffer).rotate();
+        const meta = await image.metadata();
+        const w = meta.width;
+        const h = meta.height;
+        if (!w || !h || w < 20 || h < 20) return rawBuffer;
+
+        const sampleW = 200;
+        const sampleH = Math.round((h / w) * sampleW);
+        const { data } = await image.clone().resize(sampleW, sampleH).raw().toBuffer({ resolveWithObject: true });
+
+        const getLum = (x, y) => {
+            const idx = (y * sampleW + x) * meta.channels;
+            return 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+        };
+
+        // 1. Detectar si es una foto física tomada sobre una mesa o fondo oscuro
+        let darkBorderCount = 0;
+        let totalBorderSamples = 0;
+        for (let x = 0; x < sampleW; x += 4) {
+            totalBorderSamples += 2;
+            if (getLum(x, 2) < 60) darkBorderCount++;
+            if (getLum(x, sampleH - 3) < 60) darkBorderCount++;
+        }
+        for (let y = 0; y < sampleH; y += 4) {
+            totalBorderSamples += 2;
+            if (getLum(2, y) < 60) darkBorderCount++;
+            if (getLum(sampleW - 3, y) < 60) darkBorderCount++;
+        }
+
+        const isDarkSurround = (darkBorderCount / totalBorderSamples) > 0.85;
+        if (isDarkSurround) {
+            let minX = sampleW, maxX = 0, minY = sampleH, maxY = 0;
+            for (let y = Math.floor(sampleH * 0.08); y < Math.floor(sampleH * 0.92); y++) {
+                for (let x = Math.floor(sampleW * 0.08); x < Math.floor(sampleW * 0.92); x++) {
+                    if (getLum(x, y) > 130) {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+            const cardW = maxX - minX;
+            const cardH = maxY - minY;
+            if (cardW > sampleW * 0.15 && cardH > sampleH * 0.15 && cardW < sampleW * 0.88 && cardH < sampleH * 0.88) {
+                const scaleX = w / sampleW;
+                const scaleY = h / sampleH;
+                const extractLeft = Math.max(0, Math.floor(minX * scaleX));
+                const extractTop = Math.max(0, Math.floor(minY * scaleY));
+                const extractWidth = Math.min(w - extractLeft, Math.ceil(cardW * scaleX));
+                const extractHeight = Math.min(h - extractTop, Math.ceil(cardH * scaleY));
+                return await image.extract({ left: extractLeft, top: extractTop, width: extractWidth, height: extractHeight }).toBuffer();
+            }
+        }
+
+        // 2. Detectar barras negras de capturas de pantalla móviles (arriba y/o abajo)
+        let topBarEnd = 0;
+        for (let y = 0; y < Math.floor(sampleH * 0.35); y++) {
+            let darkPixels = 0;
+            for (let x = 0; x < sampleW; x++) {
+                if (getLum(x, y) < 45) darkPixels++;
+            }
+            if (darkPixels / sampleW > 0.78) {
+                topBarEnd = y;
+            } else if (y > 4 && (darkPixels / sampleW) < 0.5) {
+                break;
+            }
+        }
+
+        let bottomBarStart = sampleH - 1;
+        for (let y = sampleH - 1; y >= Math.floor(sampleH * 0.65); y--) {
+            let darkPixels = 0;
+            for (let x = 0; x < sampleW; x++) {
+                if (getLum(x, y) < 45) darkPixels++;
+            }
+            if (darkPixels / sampleW > 0.78) {
+                bottomBarStart = y;
+            } else if ((sampleH - 1 - y) > 4 && (darkPixels / sampleW) < 0.5) {
+                break;
+            }
+        }
+
+        const hasTopBar = topBarEnd > sampleH * 0.04;
+        const hasBottomBar = (sampleH - 1 - bottomBarStart) > sampleH * 0.04;
+
+        if (hasTopBar || hasBottomBar) {
+            const scaleY = h / sampleH;
+            const cropTop = hasTopBar ? Math.min(h - 50, Math.ceil((topBarEnd + 1) * scaleY)) : 0;
+            const cropBottom = hasBottomBar ? Math.max(cropTop + 50, Math.floor(bottomBarStart * scaleY)) : h;
+            const cropHeight = cropBottom - cropTop;
+
+            if (cropHeight > 100) {
+                return await image.extract({ left: 0, top: cropTop, width: w, height: cropHeight }).toBuffer();
+            }
+        }
+
+        return await image.toBuffer();
+    } catch (e) {
+        return rawBuffer;
+    }
+}
+
+/**
  * Genera el documento Word (.docx) y PDF (.pdf) inyectando los datos
  * de los jugadores directamente sobre la plantilla original.
  */
@@ -141,6 +252,13 @@ async function generarCarnets(opciones = {}) {
         };
     });
 
+    // Ordenar jugadores agrupados por equipo y luego por nombre
+    players.sort((a, b) => {
+        const compEq = a.equipo.localeCompare(b.equipo, 'es', { sensitivity: 'base' });
+        if (compEq !== 0) return compEq;
+        return a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' });
+    });
+
     // Extraer la tabla original de la plantilla
     const tblMatch = docXml.match(/<w:tbl\b[\s\S]*?<\/w:tbl>/);
     if (!tblMatch) throw new Error('No se encontró la tabla de carnets en la plantilla original');
@@ -186,7 +304,7 @@ async function generarCarnets(opciones = {}) {
 
             if (player) {
                 const rId = `rIdCardPhotoP${pIdx}C${c}`;
-                const photoFilename = `photo_p${pIdx}_c${c}.jpeg`;
+                const photoFilename = `photo_p${pIdx}_c${c}.png`;
 
                 // Cargar imagen
                 let rawPhoto = player.buffer;
@@ -195,14 +313,25 @@ async function generarCarnets(opciones = {}) {
                 }
 
                 if (rawPhoto) {
-                    // Procesar a alta resolución Full HD (800x880) con interpolación Lanczos3 y nitidez optimizada
-                    const resized = await sharp(rawPhoto)
-                        .resize(800, 880, { fit: 'cover', position: 'center', kernel: 'lanczos3' })
-                        .sharpen({ sigma: 1.0, m1: 0.6, m2: 2.0 })
-                        .png({ quality: 100, compressionLevel: 6 })
-                        .toBuffer();
+                    // Preprocesar automáticamente: rotación EXIF, recorte de capturas de pantalla o fondos oscuros
+                    const cleanPhoto = await autoPreprocessPhoto(rawPhoto);
 
-                    const photoFilename = `photo_p${pIdx}_c${c}.png`;
+                    // Procesar a alta resolución Full HD (800x880) con detección inteligente de rostro (attention) y nitidez optimizada
+                    let resized;
+                    try {
+                        resized = await sharp(cleanPhoto)
+                            .resize(800, 880, { fit: 'cover', position: sharp.strategy.attention, kernel: 'lanczos3' })
+                            .sharpen({ sigma: 1.0, m1: 0.6, m2: 2.0 })
+                            .png({ quality: 100, compressionLevel: 6 })
+                            .toBuffer();
+                    } catch (e) {
+                        resized = await sharp(cleanPhoto)
+                            .resize(800, 880, { fit: 'cover', position: 'center', kernel: 'lanczos3' })
+                            .sharpen({ sigma: 1.0, m1: 0.6, m2: 2.0 })
+                            .png({ quality: 100, compressionLevel: 6 })
+                            .toBuffer();
+                    }
+
                     zip.file(`word/media/${photoFilename}`, resized);
                     relsXml = relsXml.replace(
                         '</Relationships>',
@@ -295,7 +424,8 @@ async function generarCarnets(opciones = {}) {
 module.exports = {
     generarCarnets,
     parseFilename,
-    toTitleCase
+    toTitleCase,
+    autoPreprocessPhoto
 };
 
 if (require.main === module) {

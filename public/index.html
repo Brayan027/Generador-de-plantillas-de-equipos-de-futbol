@@ -393,11 +393,12 @@
         .sheet-page {
             background: white;
             box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            border-radius: 4px;
+            border-radius: 2px;
             width: 100%;
             max-width: 1120px;
             aspect-ratio: 11 / 8.5; /* Carta horizontal */
-            padding: 24px;
+            padding: 12px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             border: 1px solid #cbd5e1;
@@ -424,9 +425,10 @@
             width: 33.333%;
             height: 25%;
             border: 1px solid #000000;
-            padding: 5px;
+            padding: 0;
             vertical-align: top;
             background: white;
+            box-sizing: border-box;
         }
 
         /* Exact card layout */
@@ -436,46 +438,52 @@
             flex-direction: column;
             justify-content: flex-start;
             background: #ffffff;
+            padding: 4px 6px 6px 6px;
+            box-sizing: border-box;
         }
 
         .carnet-banner-img {
             width: 100%;
-            height: 25px;
+            height: 26px;
             object-fit: fill;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
         }
 
         .carnet-body-row {
             display: flex;
+            flex: 1;
             width: 100%;
-            height: calc(100% - 29px);
-            gap: 6px;
+            gap: 8px;
             align-items: stretch;
-            padding: 2px 4px 4px 4px;
+            min-height: 0;
         }
 
         .carnet-player-photo {
-            width: 38%;
-            height: 100%;
-            max-height: 82px;
+            width: 34%;
+            aspect-ratio: 82 / 90;
+            height: auto;
+            max-height: 100%;
             object-fit: cover;
             object-position: center;
             display: block;
-            border: 1.5px solid #000000;
+            border: 1px solid #888888;
             background: #f8fafc;
+            box-sizing: border-box;
         }
 
         .carnet-info-box {
-            width: 62%;
-            background-color: #ffffff;
-            padding: 2px 4px;
+            flex: 1;
+            background-color: #f2f2f2;
+            border: 1px solid #e2e8f0;
+            padding: 6px 8px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             font-family: Arial, sans-serif;
             color: #000000;
             line-height: 1.25;
+            box-sizing: border-box;
         }
 
         .carnet-info-box .title-bold {
@@ -487,7 +495,7 @@
         .carnet-info-box .team-text {
             font-size: 11px;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             word-break: break-word;
             color: #000000;
         }
@@ -495,7 +503,7 @@
         .carnet-info-box .name-label {
             font-size: 11px;
             font-weight: bold;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
             color: #000000;
         }
 
@@ -504,6 +512,56 @@
             font-weight: normal;
             word-break: break-word;
             color: #000000;
+        }
+
+        .player-thumb-wrap {
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .thumb-crop-badge {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(15, 23, 42, 0.8);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 4px;
+            backdrop-filter: blur(2px);
+            opacity: 0.85;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .player-thumb-wrap:hover .thumb-crop-badge {
+            background: var(--primary);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .btn-crop {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 100%;
+            padding: 5px 8px;
+            background: #f8fafc;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin-top: 4px;
+        }
+        .btn-crop:hover {
+            background: #e2e8f0;
+            color: #0f172a;
         }
 
         /* Modal */
@@ -701,6 +759,37 @@
         </div>
     </div>
 
+    <!-- Modal de Recorte y Ajuste de Foto -->
+    <div class="modal-overlay" id="cropModal">
+        <div class="modal-card" style="max-width: 620px; width: 95%; text-align: left; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>✂️</span> <span id="cropModalTitle">Ajustar y Centrar Foto</span>
+                </h2>
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalRecorte()" style="padding: 4px 10px; font-size: 14px;">✕</button>
+            </div>
+            <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+                Arrastra el recuadro verde para colocar la cara del jugador en el centro. Usa las esquinas o botones para agrandar o achicar el área del carnet.
+            </p>
+            
+            <div id="cropContainer" style="position: relative; width: 100%; height: 380px; background: #0b1120; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; user-select: none;">
+                <canvas id="cropCanvas" style="max-width: 100%; max-height: 100%; cursor: move;"></canvas>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" class="btn btn-secondary" onclick="zoomCrop(-0.1)" title="Acercar encuadre">🔍 + Zoom</button>
+                    <button type="button" class="btn btn-secondary" onclick="zoomCrop(0.1)" title="Alejar encuadre">🔍 - Zoom</button>
+                    <button type="button" class="btn btn-secondary" onclick="autoCentrarCrop()" title="Centrar al medio">🎯 Centrar</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalRecorte()">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarRecorte" onclick="guardarRecorte()">💾 Guardar Recorte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let allPlayers = [];
         let currentTab = 'list';
@@ -727,7 +816,11 @@
                 const res = await fetch('/api/jugadores');
                 const data = await res.json();
                 if (data.success) {
-                    allPlayers = data.jugadores;
+                    allPlayers = (data.jugadores || []).sort((a, b) => {
+                        const compEq = a.equipo.localeCompare(b.equipo, 'es', { sensitivity: 'base' });
+                        if (compEq !== 0) return compEq;
+                        return a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' });
+                    });
                     renderPlayers(allPlayers);
                     updateCounters();
                 }
@@ -740,8 +833,9 @@
             const count = allPlayers.length;
             document.getElementById('countText').textContent = count;
             const pages = Math.ceil(count / 12) || 0;
+            const equipos = new Set(allPlayers.map(p => p.equipo)).size;
             document.getElementById('pagesCountText').textContent = `${pages} hoja${pages === 1 ? '' : 's'}`;
-            document.getElementById('statusBadge').innerHTML = `⚽ ${count} jugador${count === 1 ? '' : 'es'} (${pages} hoja${pages === 1 ? '' : 's'} de 12 carnets)`;
+            document.getElementById('statusBadge').innerHTML = `⚽ ${count} jugador${count === 1 ? '' : 'es'} · 🏆 ${equipos} equipo${equipos === 1 ? '' : 's'} (${pages} hoja${pages === 1 ? '' : 's'} de 12 carnets)`;
         }
 
         function renderPlayers(players) {
@@ -760,8 +854,9 @@
                     <button class="delete-btn" onclick="eliminarJugador('${escapeHtml(p.filename)}')" title="Eliminar foto">
                         ✕
                     </button>
-                    <div class="player-thumb-wrap">
-                        <img src="${p.url}" alt="${escapeHtml(p.nombre)}" class="player-thumb" loading="lazy">
+                    <div class="player-thumb-wrap" onclick="abrirModalRecorte('${escapeHtml(p.filename)}', '${p.url}')" title="Clic para recortar o centrar el rostro">
+                        <img src="${p.urlCarnet || p.url}" alt="${escapeHtml(p.nombre)}" class="player-thumb" loading="lazy">
+                        <div class="thumb-crop-badge">✂️ Ajustar</div>
                     </div>
                     <div class="player-fields">
                         <div class="field-group">
@@ -774,6 +869,9 @@
                             <input type="text" class="field-input" value="${escapeHtml(p.nombre)}" 
                                    onchange="actualizarJugador('${escapeHtml(p.filename)}', null, this.value)">
                         </div>
+                        <button type="button" class="btn-crop" onclick="abrirModalRecorte('${escapeHtml(p.filename)}', '${p.url}')">
+                            ✂️ Encuadrar / Centrar Rostro
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -931,7 +1029,7 @@
                                     <div class="carnet-box">
                                         <img src="/banner.png" alt="Torneo San Antonio" class="carnet-banner-img">
                                         <div class="carnet-body-row">
-                                            <img src="${player.url}" class="carnet-player-photo" alt="${escapeHtml(player.nombre)}">
+                                            <img src="${player.urlCarnet || player.url}" class="carnet-player-photo" alt="${escapeHtml(player.nombre)}">
                                             <div class="carnet-info-box">
                                                 <div class="team-text">
                                                     <span class="title-bold">EQUIPO:</span> ${escapeHtml(player.equipo)}
@@ -1029,6 +1127,263 @@
 
         function cerrarModal() {
             document.getElementById('resultModal').classList.remove('active');
+        }
+
+        // ================= CROPPER MODAL INTERACTIVO =================
+        let cropState = {
+            filename: null,
+            img: null,
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            initCropX: 0,
+            initCropY: 0,
+            initCropW: 0,
+            initCropH: 0,
+            mode: 'move'
+        };
+
+        function abrirModalRecorte(filename, rawUrl) {
+            cropState.filename = filename;
+            const p = allPlayers.find(item => item.filename === filename);
+            const title = p ? `Ajustar Foto: ${p.nombre}` : 'Ajustar y Centrar Foto';
+            document.getElementById('cropModalTitle').textContent = title;
+            
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                cropState.img = img;
+                const canvas = document.getElementById('cropCanvas');
+                const container = document.getElementById('cropContainer');
+                const maxW = container.clientWidth || 550;
+                const maxH = container.clientHeight || 380;
+                
+                let displayW = img.width;
+                let displayH = img.height;
+                const scale = Math.min(maxW / displayW, maxH / displayH, 1);
+                displayW = Math.round(displayW * scale);
+                displayH = Math.round(displayH * scale);
+                
+                canvas.width = displayW;
+                canvas.height = displayH;
+                
+                // Ratio del carnet: 800 x 880 (ancho / alto = 0.90909)
+                const targetRatio = 800 / 880;
+                let boxH = Math.round(displayH * 0.75);
+                let boxW = Math.round(boxH * targetRatio);
+                if (boxW > displayW) {
+                    boxW = Math.round(displayW * 0.85);
+                    boxH = Math.round(boxW / targetRatio);
+                }
+                
+                cropState.width = boxW;
+                cropState.height = boxH;
+                cropState.x = Math.round((displayW - boxW) / 2);
+                cropState.y = Math.round((displayH - boxH) / 2);
+                
+                dibujarCropper();
+                document.getElementById('cropModal').classList.add('active');
+            };
+            img.src = `${rawUrl}${rawUrl.includes('?') ? '&' : '?'}v=${Date.now()}`;
+        }
+
+        function cerrarModalRecorte() {
+            document.getElementById('cropModal').classList.remove('active');
+            cropState.img = null;
+            cropState.isDragging = false;
+        }
+
+        function dibujarCropper() {
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+            const img = cropState.img;
+            if (!img) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Sombra oscura exterior
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+            ctx.fillRect(0, 0, canvas.width, cropState.y);
+            ctx.fillRect(0, cropState.y + cropState.height, canvas.width, canvas.height - (cropState.y + cropState.height));
+            ctx.fillRect(0, cropState.y, cropState.x, cropState.height);
+            ctx.fillRect(cropState.x + cropState.width, cropState.y, canvas.width - (cropState.x + cropState.width), cropState.height);
+            
+            // Marco verde del carnet
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(cropState.x, cropState.y, cropState.width, cropState.height);
+            
+            // Cuadrícula 3x3 sutil
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cropState.x + cropState.width / 3, cropState.y);
+            ctx.lineTo(cropState.x + cropState.width / 3, cropState.y + cropState.height);
+            ctx.moveTo(cropState.x + (cropState.width * 2) / 3, cropState.y);
+            ctx.lineTo(cropState.x + (cropState.width * 2) / 3, cropState.y + cropState.height);
+            ctx.moveTo(cropState.x, cropState.y + cropState.height / 3);
+            ctx.lineTo(cropState.x + cropState.width, cropState.y + cropState.height / 3);
+            ctx.moveTo(cropState.x, cropState.y + (cropState.height * 2) / 3);
+            ctx.lineTo(cropState.x + cropState.width, cropState.y + (cropState.height * 2) / 3);
+            ctx.stroke();
+            
+            // Manija de redimensión esquina inferior derecha
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(cropState.x + cropState.width - 12, cropState.y + cropState.height - 12, 12, 12);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(cropState.x + cropState.width - 12, cropState.y + cropState.height - 12, 12, 12);
+        }
+
+        function getCropCanvasPos(e) {
+            const canvas = document.getElementById('cropCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function setupCropListeners() {
+            const canvas = document.getElementById('cropCanvas');
+            if (!canvas) return;
+            
+            const onStart = (e) => {
+                if (!cropState.img) return;
+                const pos = getCropCanvasPos(e);
+                if (pos.x >= cropState.x + cropState.width - 20 && pos.x <= cropState.x + cropState.width + 10 &&
+                    pos.y >= cropState.y + cropState.height - 20 && pos.y <= cropState.y + cropState.height + 10) {
+                    cropState.mode = 'resize';
+                } else if (pos.x >= cropState.x && pos.x <= cropState.x + cropState.width &&
+                           pos.y >= cropState.y && pos.y <= cropState.y + cropState.height) {
+                    cropState.mode = 'move';
+                } else {
+                    return;
+                }
+                cropState.isDragging = true;
+                cropState.dragStartX = pos.x;
+                cropState.dragStartY = pos.y;
+                cropState.initCropX = cropState.x;
+                cropState.initCropY = cropState.y;
+                cropState.initCropW = cropState.width;
+                cropState.initCropH = cropState.height;
+                if (e.cancelable) e.preventDefault();
+            };
+
+            const onMove = (e) => {
+                if (!cropState.isDragging) return;
+                const pos = getCropCanvasPos(e);
+                const dx = pos.x - cropState.dragStartX;
+                const dy = pos.y - cropState.dragStartY;
+                
+                if (cropState.mode === 'move') {
+                    cropState.x = Math.max(0, Math.min(canvas.width - cropState.width, cropState.initCropX + dx));
+                    cropState.y = Math.max(0, Math.min(canvas.height - cropState.height, cropState.initCropY + dy));
+                } else if (cropState.mode === 'resize') {
+                    const targetRatio = 800 / 880;
+                    let newW = Math.max(40, cropState.initCropW + dx);
+                    let newH = Math.round(newW / targetRatio);
+                    if (cropState.x + newW <= canvas.width && cropState.y + newH <= canvas.height) {
+                        cropState.width = newW;
+                        cropState.height = newH;
+                    }
+                }
+                dibujarCropper();
+                if (e.cancelable) e.preventDefault();
+            };
+
+            const onEnd = () => {
+                cropState.isDragging = false;
+            };
+
+            canvas.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            canvas.addEventListener('touchstart', onStart, { passive: false });
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('touchend', onEnd);
+            
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                zoomCrop(e.deltaY > 0 ? 0.08 : -0.08);
+            }, { passive: false });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setupCropListeners();
+        });
+
+        function zoomCrop(factor) {
+            const targetRatio = 800 / 880;
+            const dW = Math.round(cropState.width * factor);
+            const dH = Math.round(dW / targetRatio);
+            const newW = cropState.width + dW;
+            const newH = cropState.height + dH;
+            const canvas = document.getElementById('cropCanvas');
+            if (newW > 40 && newH > 40 && cropState.x + newW <= canvas.width && cropState.y + newH <= canvas.height) {
+                cropState.width = newW;
+                cropState.height = newH;
+                dibujarCropper();
+            }
+        }
+
+        function autoCentrarCrop() {
+            const canvas = document.getElementById('cropCanvas');
+            cropState.x = Math.round((canvas.width - cropState.width) / 2);
+            cropState.y = Math.round((canvas.height - cropState.height) / 2);
+            dibujarCropper();
+        }
+
+        async function guardarRecorte() {
+            const btn = document.getElementById('btnGuardarRecorte');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Guardando...';
+            
+            try {
+                const canvas = document.getElementById('cropCanvas');
+                const scaleX = cropState.img.naturalWidth / canvas.width;
+                const scaleY = cropState.img.naturalHeight / canvas.height;
+                
+                const crop = {
+                    left: Math.round(cropState.x * scaleX),
+                    top: Math.round(cropState.y * scaleY),
+                    width: Math.round(cropState.width * scaleX),
+                    height: Math.round(cropState.height * scaleY)
+                };
+                
+                const res = await fetch('/api/recortar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: cropState.filename,
+                        crop
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    cerrarModalRecorte();
+                    await cargarJugadores();
+                    if (currentTab === 'preview') {
+                        renderSheetPreview();
+                    }
+                } else {
+                    alert('Error al guardar el recorte: ' + (data.error || 'Desconocido'));
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
 
         function escapeHtml(str) {

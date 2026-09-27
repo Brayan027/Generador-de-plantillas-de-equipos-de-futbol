@@ -2,8 +2,9 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const sharp = require('sharp');
 const { exec } = require('child_process');
-const { generarCarnets, parseFilename, toTitleCase } = require('./generador');
+const { generarCarnets, parseFilename, toTitleCase, autoPreprocessPhoto } = require('./generador');
 
 const app = express();
 const PORT = 3000;
@@ -47,31 +48,102 @@ app.get('/api/jugadores', (req, res) => {
             return {
                 filename: file,
                 url: `/fotos/${encodeURIComponent(file)}?t=${stat.mtimeMs}`,
+                urlCarnet: `/api/foto-carnet/${encodeURIComponent(file)}?t=${stat.mtimeMs}`,
                 equipo: parsed.equipo,
                 nombre: parsed.nombre,
                 size: stat.size,
                 mtime: stat.mtime
             };
         });
+
+        // Ordenar por equipo y luego por nombre
+        jugadores.sort((a, b) => {
+            const compEq = a.equipo.localeCompare(b.equipo, 'es', { sensitivity: 'base' });
+            if (compEq !== 0) return compEq;
+            return a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' });
+        });
+
         res.json({ success: true, jugadores });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// 2. Subir fotos
-app.post('/api/upload', upload.array('fotos', 100), (req, res) => {
+// Endpoint para servir foto centrada inteligentemente en el rostro
+app.get('/api/foto-carnet/:filename', async (req, res) => {
     try {
-        const subidos = (req.files || []).map(f => {
+        const filePath = path.join(FOTOS_DIR, req.params.filename);
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).send('Foto no encontrada');
+        }
+        const raw = fs.readFileSync(filePath);
+        const clean = await autoPreprocessPhoto(raw);
+        const buf = await sharp(clean)
+            .resize(400, 440, { fit: 'cover', position: sharp.strategy.attention, kernel: 'lanczos3' })
+            .jpeg({ quality: 92 })
+            .toBuffer();
+        res.set('Content-Type', 'image/jpeg');
+        res.set('Cache-Control', 'public, max-age=86400');
+        res.send(buf);
+    } catch (err) {
+        res.sendFile(path.join(FOTOS_DIR, req.params.filename));
+    }
+});
+
+// 2. Subir fotos (con auto-limpieza inteligente de franjas y tarjetas)
+app.post('/api/upload', upload.array('fotos', 100), async (req, res) => {
+    try {
+        const subidos = [];
+        for (const f of (req.files || [])) {
+            try {
+                const fPath = path.join(FOTOS_DIR, f.filename);
+                const raw = fs.readFileSync(fPath);
+                const clean = await autoPreprocessPhoto(raw);
+                if (clean && clean.length !== raw.length) {
+                    fs.writeFileSync(fPath, clean);
+                }
+            } catch (e) {}
+
             const parsed = parseFilename(f.filename);
-            return {
+            subidos.push({
                 filename: f.filename,
                 url: `/fotos/${encodeURIComponent(f.filename)}`,
+                urlCarnet: `/api/foto-carnet/${encodeURIComponent(f.filename)}`,
                 equipo: parsed.equipo,
                 nombre: parsed.nombre
-            };
-        });
+            });
+        }
         res.json({ success: true, count: subidos.length, jugadores: subidos });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Endpoint para recortar o reencuadrar manualmente cualquier foto desde el panel web
+app.post('/api/recortar', async (req, res) => {
+    try {
+        const { filename, crop } = req.body;
+        if (!filename || !crop) {
+            return res.status(400).json({ success: false, error: 'Parámetros incompletos' });
+        }
+        const filePath = path.join(FOTOS_DIR, filename);
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ success: false, error: 'Foto no encontrada' });
+        }
+        const raw = fs.readFileSync(filePath);
+        const meta = await sharp(raw).metadata();
+        const left = Math.max(0, Math.min(meta.width - 20, Math.round(crop.left)));
+        const top = Math.max(0, Math.min(meta.height - 20, Math.round(crop.top)));
+        const width = Math.min(meta.width - left, Math.round(crop.width));
+        const height = Math.min(meta.height - top, Math.round(crop.height));
+
+        const cropped = await sharp(raw)
+            .extract({ left, top, width, height })
+            .jpeg({ quality: 98 })
+            .toBuffer();
+
+        fs.writeFileSync(filePath, cropped);
+        res.json({ success: true });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
