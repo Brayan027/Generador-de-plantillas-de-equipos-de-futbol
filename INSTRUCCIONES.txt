@@ -1,0 +1,54 @@
+========================================================================
+  GENERADOR AUTOMÁTICO DE PLANILLAS Y CARNETS - TORNEO SAN ANTONIO
+========================================================================
+
+¡Hola! Este sistema automatiza completamente la creación de los carnets
+de fútbol manteniendo exactamente el mismo diseño, medidas y encabezado
+de tu plantilla original, exportando en Word (.docx) y en PDF (.pdf).
+
+------------------------------------------------------------------------
+¿CÓMO NOMBRAR LAS FOTOS QUE DESCARGAS DE WHATSAPP?
+------------------------------------------------------------------------
+Cuando descargues la foto del jugador desde WhatsApp, guárdala en la
+carpeta 'fotos_jugadores' con este formato:
+
+    Nombre del Equipo - Nombre del Jugador.jpg
+
+Por ejemplo:
+    Cobradores - Jose Gonzalez.jpg
+    Elite FC - Gabriel Antonio Gonzalez Garcia.png
+    Titanes FC - Wilmer Enrique Mejia Mendez.jpeg
+
+(El guion '-' separa automáticamente el equipo del nombre del jugador).
+
+------------------------------------------------------------------------
+TIENES 2 FORMAS SUPER FÁCILES DE USARLO:
+------------------------------------------------------------------------
+
+OPCIÓN 1: AUTOMÁTICO CON 1 SOLO CLIC (El más rápido)
+1. Coloca las fotos en la carpeta 'fotos_jugadores'.
+2. Haz doble clic sobre el archivo:
+   👉 GENERAR_CARNETS_DIRECTO.bat
+3. En 3 segundos se generará el archivo Word (.docx) y el PDF (.pdf) en
+   la carpeta 'salida' y se abrirá automáticamente el PDF listo para imprimir.
+
+OPCIÓN 2: PANEL VISUAL EN TU NAVEGADOR
+1. Haz doble clic sobre el archivo:
+   👉 ABRIR_PANEL_WEB.bat
+2. Se abrirá una página web en tu navegador donde puedes:
+   - Arrastrar y soltar las fotos directamente de WhatsApp.
+   - Ver la lista de jugadores y editar cualquier nombre o equipo al instante.
+   - Ver la "Vista Previa de Impresión" en tiempo real con las hojas tamaño
+     carta horizontal y los 12 carnets organizados (3 columnas x 4 filas).
+   - Presionar el botón "Generar Word & PDF".
+
+------------------------------------------------------------------------
+CARPETAS DEL SISTEMA:
+------------------------------------------------------------------------
+- fotos_jugadores\ : Aquí se guardan las fotos descargadas.
+- salida\          : Aquí se guardan tus archivos Word (.docx) y PDF (.pdf).
+- banner.png       : La franja oficial superior de 'TORNEO SAN ANTONIO'.
+
+¡Y listo! Ya no tendrás que recortar fotos a mano ni lidiar con tablas
+descuadradas en Word.
+========================================================================

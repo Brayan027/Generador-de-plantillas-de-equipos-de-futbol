@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Planillas y Carnets - Torneo San Antonio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --dark: #0f172a;
+            --slate: #334155;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --danger: #ef4444;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .brand-text p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #ffffff;
+            color: var(--slate);
+            border-color: var(--border);
+        }
+        .btn-secondary:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+        .btn-danger:hover {
+            background-color: #fecaca;
+        }
+
+        /* Layout */
+        main {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tabs-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 2px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--muted);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-dark);
+            border-bottom-color: var(--primary);
+        }
+
+        .status-badge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Dropzone */
+        .dropzone {
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius);
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--primary);
+            background: #f0fdf4;
+        }
+
+        .dropzone-icon {
+            width: 52px;
+            height: 52px;
+            background: #e6fcf5;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px;
+        }
+
+        .dropzone h3 {
+            font-size: 16.5px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #1e293b;
+        }
+
+        .dropzone p {
+            font-size: 13.5px;
+            color: var(--muted);
+            max-width: 650px;
+            margin: 0 auto 12px;
+            line-height: 1.5;
+        }
+
+        .dropzone .format-tip {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #475569;
+        }
+        .dropzone .format-tip code {
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            flex: 1;
+            max-width: 380px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        /* Grid */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .player-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: all 0.15s ease;
+        }
+
+        .player-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
+        }
+
+        .player-thumb-wrap {
+            width: 74px;
+            height: 88px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f1f5f9;
+            flex-shrink: 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .player-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .player-fields {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .field-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 5px 8px;
+            font-size: 13.5px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            color: #1e293b;
+            font-weight: 500;
+            background: #f8fafc;
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+            background: #fee2e2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        /* Sheet Preview View */
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .sheet-page {
+            background: white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            border-radius: 4px;
+            width: 100%;
+            max-width: 1120px;
+            aspect-ratio: 11 / 8.5; /* Carta horizontal */
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #cbd5e1;
+        }
+
+        .sheet-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 12.5px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .carnets-table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .carnets-table td {
+            width: 33.333%;
+            height: 25%;
+            border: 1px solid #000000;
+            padding: 5px;
+            vertical-align: top;
+            background: white;
+        }
+
+        /* Exact card layout */
+        .carnet-box {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background: #ffffff;
+        }
+
+        .carnet-banner-img {
+            width: 100%;
+            height: 25px;
+            object-fit: fill;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .carnet-body-row {
+            display: flex;
+            width: 100%;
+            height: calc(100% - 29px);
+            gap: 6px;
+            align-items: stretch;
+            padding: 2px 4px 4px 4px;
+        }
+
+        .carnet-player-photo {
+            width: 38%;
+            height: 100%;
+            max-height: 82px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            border: 1.5px solid #000000;
+            background: #f8fafc;
+        }
+
+        .carnet-info-box {
+            width: 62%;
+            background-color: #ffffff;
+            padding: 2px 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            font-family: Arial, sans-serif;
+            color: #000000;
+            line-height: 1.25;
+        }
+
+        .carnet-info-box .title-bold {
+            font-weight: bold;
+            font-size: 11px;
+            color: #000000;
+        }
+
+        .carnet-info-box .team-text {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            word-break: break-word;
+            color: #000000;
+        }
+
+        .carnet-info-box .name-label {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: #000000;
+        }
+
+        .carnet-info-box .player-name-text {
+            font-size: 11px;
+            font-weight: normal;
+            word-break: break-word;
+            color: #000000;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 90%;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.25s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            background: #d1fae5;
+            color: #059669;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 16px;
+        }
+
+        .modal-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .modal-card p {
+            font-size: 14.5px;
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">⚽</div>
+                <div class="brand-text">
+                    <h1>Torneo San Antonio</h1>
+                    <p>Generador Automático de Planillas & Carnets (Word & PDF)</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="abrirCarpetaFotos()">
+                    📁 Fotos
+                </button>
+                <button class="btn btn-secondary" onclick="abrirCarpetaSalida()">
+                    📂 Salida
+                </button>
+                <button id="btnGenerar" class="btn btn-primary" onclick="generarDocumentos()">
+                    <span>🚀 Generar Word & PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Tabs -->
+        <div class="tabs-bar">
+            <div class="tab-buttons">
+                <button class="tab-btn active" id="tabBtnList" onclick="setTab('list')">
+                    📋 Lista de Jugadores (<span id="countText">0</span>)
+                </button>
+                <button class="tab-btn" id="tabBtnPreview" onclick="setTab('preview')">
+                    📄 Vista Previa de Impresión (<span id="pagesCountText">0 hojas</span>)
+                </button>
+            </div>
+            <div class="status-badge" id="statusBadge">
+                ✨ 12 carnets homogéneos por hoja horizontal
+            </div>
+        </div>
+
+        <!-- View 1: List -->
+        <div id="viewList" style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                <div class="dropzone-icon">📥</div>
+                <h3>Arrastra y suelta aquí las fotos de WhatsApp</h3>
+                <p>O haz clic para seleccionar fotos. Si escribes en minúsculas, el sistema pondrá automáticamente la primera letra en mayúscula.</p>
+                <div class="format-tip">
+                    💡 Formato de archivo: <code>nombre equipo - nombre jugador.jpg</code> (ej: <b>cobradores - jose gonzalez.jpg</b>)
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="searchInput" placeholder="Buscar jugador o equipo..." oninput="filterPlayers()">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="cargarJugadores()">
+                        🔄 Refrescar
+                    </button>
+                    <button class="btn btn-danger" onclick="limpiarTodo()">
+                        🗑️ Vaciar Fotos
+                    </button>
+                </div>
+            </div>
+
+            <div class="players-grid" id="playersGrid"></div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div style="font-size: 48px; margin-bottom: 12px;">⚽</div>
+                <h3>No hay jugadores cargados todavía</h3>
+                <p>Arrastra las fotos descargadas de WhatsApp a la caja superior para empezar.</p>
+            </div>
+        </div>
+
+        <!-- View 2: Sheet Print Preview -->
+        <div id="viewPreview" style="display: none;" class="preview-container">
+            <div id="sheetPages" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+        </div>
+    </main>
+
+    <!-- Modal de Éxito -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-card">
+            <div class="modal-icon">✅</div>
+            <h2>¡Planilla Generada con Éxito!</h2>
+            <p id="modalDesc">Tus carnets están listos con el diseño exacto en Word y PDF.</p>
+            
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="abrirArchivo('pdf')" style="justify-content: center;">
+                    📑 Abrir Documento PDF
+                </button>
+                <button class="btn btn-secondary" onclick="abrirArchivo('docx')" style="justify-content: center;">
+                    📄 Abrir en Microsoft Word (.docx)
+                </button>
+                <button class="btn btn-secondary" onclick="abrirCarpetaSalida()" style="justify-content: center;">
+                    📂 Ver en la Carpeta
+                </button>
+                <button class="btn" onclick="cerrarModal()" style="color: var(--muted); margin-top: 8px;">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allPlayers = [];
+        let currentTab = 'list';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarJugadores();
+            setupDropzone();
+        });
+
+        function setTab(tab) {
+            currentTab = tab;
+            document.getElementById('tabBtnList').classList.toggle('active', tab === 'list');
+            document.getElementById('tabBtnPreview').classList.toggle('active', tab === 'preview');
+            document.getElementById('viewList').style.display = tab === 'list' ? 'flex' : 'none';
+            document.getElementById('viewPreview').style.display = tab === 'preview' ? 'flex' : 'none';
+
+            if (tab === 'preview') {
+                renderSheetPreview();
+            }
+        }
+
+        async function cargarJugadores() {
+            try {
+                const res = await fetch('/api/jugadores');
+                const data = await res.json();
+                if (data.success) {
+                    allPlayers = data.jugadores;
+                    renderPlayers(allPlayers);
+                    updateCounters();
+                }
+            } catch (err) {
+                console.error("Error al cargar jugadores:", err);
+            }
+        }
+
+        function updateCounters() {
+            const count = allPlayers.length;
+            document.getElementById('countText').textContent = count;
+            const pages = Math.ceil(count / 12) || 0;
+            document.getElementById('pagesCountText').textContent = `${pages} hoja${pages === 1 ? '' : 's'}`;
+            document.getElementById('statusBadge').innerHTML = `⚽ ${count} jugador${count === 1 ? '' : 'es'} (${pages} hoja${pages === 1 ? '' : 's'} de 12 carnets)`;
+        }
+
+        function renderPlayers(players) {
+            const grid = document.getElementById('playersGrid');
+            const empty = document.getElementById('emptyState');
+
+            if (!players || players.length === 0) {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            grid.innerHTML = players.map((p) => `
+                <div class="player-card" data-filename="${escapeHtml(p.filename)}">
+                    <button class="delete-btn" onclick="eliminarJugador('${escapeHtml(p.filename)}')" title="Eliminar foto">
+                        ✕
+                    </button>
+                    <div class="player-thumb-wrap">
+                        <img src="${p.url}" alt="${escapeHtml(p.nombre)}" class="player-thumb" loading="lazy">
+                    </div>
+                    <div class="player-fields">
+                        <div class="field-group">
+                            <label class="field-label">EQUIPO</label>
+                            <input type="text" class="field-input" value="${escapeHtml(p.equipo)}" 
+                                   onchange="actualizarJugador('${escapeHtml(p.filename)}', this.value, null)">
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">NOMBRE DEL JUGADOR</label>
+                            <input type="text" class="field-input" value="${escapeHtml(p.nombre)}" 
+                                   onchange="actualizarJugador('${escapeHtml(p.filename)}', null, this.value)">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterPlayers() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!q) {
+                renderPlayers(allPlayers);
+                return;
+            }
+            const filtered = allPlayers.filter(p => 
+                p.nombre.toLowerCase().includes(q) || 
+                p.equipo.toLowerCase().includes(q)
+            );
+            renderPlayers(filtered);
+        }
+
+        async function actualizarJugador(filename, nuevoEquipo, nuevoNombre) {
+            const player = allPlayers.find(p => p.filename === filename);
+            if (!player) return;
+
+            const eq = nuevoEquipo !== null ? nuevoEquipo : player.equipo;
+            const nom = nuevoNombre !== null ? nuevoNombre : player.nombre;
+
+            try {
+                const res = await fetch('/api/actualizar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        oldFilename: filename,
+                        nuevoEquipo: eq,
+                        nuevoNombre: nom
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                }
+            } catch (err) {
+                console.error("Error al actualizar:", err);
+            }
+        }
+
+        async function eliminarJugador(filename) {
+            if (!confirm(`¿Eliminar la foto de este jugador?`)) return;
+            try {
+                await fetch(`/api/jugador/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+                await cargarJugadores();
+            } catch (err) {
+                console.error("Error al eliminar:", err);
+            }
+        }
+
+        async function limpiarTodo() {
+            if (!confirm('¿Estás seguro de que deseas vaciar todas las fotos para empezar un nuevo grupo?')) return;
+            try {
+                await fetch('/api/limpiar', { method: 'POST' });
+                await cargarJugadores();
+            } catch (err) {
+                console.error("Error al limpiar:", err);
+            }
+        }
+
+        function setupDropzone() {
+            const dropzone = document.getElementById('dropzone');
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length > 0) {
+                    uploadFiles(files);
+                }
+            });
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                uploadFiles(files);
+            }
+        }
+
+        async function uploadFiles(files) {
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('fotos', files[i]);
+            }
+
+            const dropzone = document.getElementById('dropzone');
+            const originalHTML = dropzone.innerHTML;
+            dropzone.innerHTML = `
+                <div class="dropzone-icon"><span class="spinner"></span></div>
+                <h3>Subiendo ${files.length} fotos...</h3>
+                <p>Poniendo mayúsculas y detectando equipos y nombres...</p>
+            `;
+
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                }
+            } catch (err) {
+                console.error("Error al subir:", err);
+                alert("Hubo un error al subir las fotos.");
+            } finally {
+                dropzone.innerHTML = originalHTML;
+            }
+        }
+
+        function renderSheetPreview() {
+            const container = document.getElementById('sheetPages');
+            if (allPlayers.length === 0) {
+                container.innerHTML = '<div class="empty-state">No hay jugadores para mostrar la vista previa.</div>';
+                return;
+            }
+
+            const CARDS_PER_PAGE = 12;
+            const totalPages = Math.ceil(allPlayers.length / CARDS_PER_PAGE);
+            let html = '';
+
+            for (let p = 0; p < totalPages; p++) {
+                const pagePlayers = allPlayers.slice(p * CARDS_PER_PAGE, (p + 1) * CARDS_PER_PAGE);
+                
+                let tableHtml = '<table class="carnets-table"><tbody>';
+                for (let r = 0; r < 4; r++) {
+                    tableHtml += '<tr>';
+                    for (let c = 0; c < 3; c++) {
+                        const idx = r * 3 + c;
+                        const player = pagePlayers[idx];
+
+                        if (!player) {
+                            tableHtml += '<td></td>';
+                        } else {
+                            tableHtml += `
+                                <td>
+                                    <div class="carnet-box">
+                                        <img src="/banner.png" alt="Torneo San Antonio" class="carnet-banner-img">
+                                        <div class="carnet-body-row">
+                                            <img src="${player.url}" class="carnet-player-photo" alt="${escapeHtml(player.nombre)}">
+                                            <div class="carnet-info-box">
+                                                <div class="team-text">
+                                                    <span class="title-bold">EQUIPO:</span> ${escapeHtml(player.equipo)}
+                                                </div>
+                                                <div class="name-label">
+                                                    <span class="title-bold">NOMBRE:</span>
+                                                </div>
+                                                <div class="player-name-text">
+                                                    ${escapeHtml(player.nombre)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            `;
+                        }
+                    }
+                    tableHtml += '</tr>';
+                }
+                tableHtml += '</tbody></table>';
+
+                html += `
+                    <div style="width: 100%; max-width: 1120px; margin-bottom: 24px;">
+                        <div class="sheet-header-info">
+                            <span>📄 HOJA ${p + 1} DE ${totalPages} (Formato Carta Horizontal - 12 Carnets)</span>
+                            <span>${pagePlayers.length} Carnets en esta hoja</span>
+                        </div>
+                        <div class="sheet-page">
+                            ${tableHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        async function generarDocumentos() {
+            if (allPlayers.length === 0) {
+                alert("Primero debes agregar al menos una foto de jugador.");
+                return;
+            }
+
+            const btn = document.getElementById('btnGenerar');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="spinner"></span> Procesando ${allPlayers.length} carnets...`;
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/generar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('modalDesc').textContent = 
+                        `Se generaron exitosamente ${data.totalJugadores} carnets en ${data.totalPaginas} página(s) horizontales. Los archivos Word y PDF están listos.`;
+                    document.getElementById('resultModal').classList.add('active');
+                } else {
+                    alert("Error: " + (data.message || data.error));
+                }
+            } catch (err) {
+                console.error("Error al generar:", err);
+                alert("Hubo un error al generar los documentos.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function abrirArchivo(tipo) {
+            fetch('/api/abrir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo })
+            });
+        }
+
+        function abrirCarpetaFotos() {
+            fetch('/api/abrir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: 'fotos' })
+            });
+        }
+
+        function abrirCarpetaSalida() {
+            fetch('/api/abrir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: 'salida' })
+            });
+        }
+
+        function cerrarModal() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>

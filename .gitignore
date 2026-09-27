@@ -1,0 +1,12 @@
+# Dependencias
+node_modules/
+
+# Temporales y archivos generados
+salida/
+plantilla_extracted/
+xml original.xml
+*.tmp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
