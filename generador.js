@@ -195,12 +195,14 @@ async function generarCarnets(opciones = {}) {
                 }
 
                 if (rawPhoto) {
-                    // Redimensionar centrando el rostro/sujeto en el recuadro
+                    // Procesar a alta resolución Full HD (800x880) con interpolación Lanczos3 y nitidez optimizada
                     const resized = await sharp(rawPhoto)
-                        .resize(300, 330, { fit: 'cover', position: 'center' })
-                        .jpeg({ quality: 95 })
+                        .resize(800, 880, { fit: 'cover', position: 'center', kernel: 'lanczos3' })
+                        .sharpen({ sigma: 1.0, m1: 0.6, m2: 2.0 })
+                        .png({ quality: 100, compressionLevel: 6 })
                         .toBuffer();
 
+                    const photoFilename = `photo_p${pIdx}_c${c}.png`;
                     zip.file(`word/media/${photoFilename}`, resized);
                     relsXml = relsXml.replace(
                         '</Relationships>',

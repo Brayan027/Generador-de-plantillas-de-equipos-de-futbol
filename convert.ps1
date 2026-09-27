@@ -19,9 +19,13 @@ try {
     $doc.PageSetup.LeftMargin = 8.5
     $doc.PageSetup.RightMargin = 8.5
 
+    # Desactivar compresión de imágenes de Word para preservar nitidez original Full HD
+    try { $word.Options.DoNotCompressPictures = $true } catch {}
+
     if ($PdfPath) {
-        $doc.SaveAs([ref]$PdfPath, [ref]17) # 17 = wdFormatPDF
-        Write-Host "PDF exportado en horizontal a: $PdfPath"
+        # ExportAsFixedFormat: Format=17 (PDF), OpenAfterExport=$false, OptimizeFor=0 (wdExportOptimizeForPrint = 300+ DPI)
+        $doc.ExportAsFixedFormat($PdfPath, 17, $false, 0)
+        Write-Host "PDF exportado en horizontal a máxima resolución Full HD: $PdfPath"
     }
     $doc.Close([ref]0)
 } catch {
