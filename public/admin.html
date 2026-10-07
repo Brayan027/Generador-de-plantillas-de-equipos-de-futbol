@@ -1704,19 +1704,16 @@
         <div class="modal-card">
             <div class="modal-icon">✅</div>
             <h2>¡Planilla Generada con Éxito!</h2>
-            <p id="modalDesc">Tus carnets están listos con el diseño exacto en Word y PDF.</p>
+            <p id="modalDesc">Tus carnets están listos. La descarga iniciará automáticamente.</p>
             
             <div class="modal-actions">
-                <button class="btn btn-primary" onclick="abrirArchivo('pdf')" style="justify-content: center;">
-                    📑 Abrir Documento PDF
+                <button class="btn btn-primary" onclick="descargarArchivo('docx')" style="justify-content: center; font-size: 15px; padding: 13px;">
+                    📥 Descargar Documento Word (.docx)
                 </button>
-                <button class="btn btn-secondary" onclick="abrirArchivo('docx')" style="justify-content: center;">
-                    📄 Abrir en Microsoft Word (.docx)
+                <button class="btn btn-secondary" onclick="descargarArchivo('pdf')" style="justify-content: center; font-size: 14px;">
+                    📑 Descargar Formato PDF / Alternativo
                 </button>
-                <button class="btn btn-secondary" onclick="abrirCarpetaSalida()" style="justify-content: center;">
-                    📂 Ver en la Carpeta
-                </button>
-                <button class="btn" onclick="cerrarModal()" style="color: var(--muted); margin-top: 6px;">
+                <button class="btn btn-secondary" onclick="cerrarModal()" style="justify-content: center;">
                     Cerrar
                 </button>
             </div>
@@ -3086,9 +3083,16 @@
 
                 if (data.success) {
                     document.getElementById('modalDesc').textContent = 
-                        `Se generaron exitosamente ${data.totalJugadores || ''} carnets en ${data.totalPaginas || ''} página(s) horizontales. Los archivos Word y PDF están listos.` +
-                        (data.marcadosComoImpresos ? ` Se actualizaron los registros como impresos automáticamente.` : '');
+                        `Se generaron exitosamente ${data.totalJugadores || ''} carnets en ${data.totalPaginas || ''} página(s) horizontales. ¡Tu archivo Word se está descargando ahora mismo!`;
                     document.getElementById('resultModal').classList.add('active');
+                    
+                    // Descarga automática inmediata al terminar la generación
+                    try {
+                        descargarArchivo('docx');
+                    } catch (e) {
+                        console.warn("Auto-download triggered fallback:", e);
+                    }
+
                     await cargarJugadores();
                     await cargarEquipos();
                 } else {
@@ -3104,28 +3108,27 @@
             }
         }
 
+        function descargarArchivo(tipo) {
+            const token = localStorage.getItem('admin_token') || '';
+            const url = `/api/descargar/${tipo}?token=${encodeURIComponent(token)}`;
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', tipo === 'docx' ? 'Carnets_Torneo.docx' : 'Carnets_Torneo.pdf');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         function abrirArchivo(tipo) {
-            fetch('/api/abrir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tipo })
-            });
+            descargarArchivo(tipo);
         }
 
         function abrirCarpetaFotos() {
-            fetch('/api/abrir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tipo: 'fotos' })
-            });
+            descargarArchivo('docx');
         }
 
         function abrirCarpetaSalida() {
-            fetch('/api/abrir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tipo: 'salida' })
-            });
+            descargarArchivo('docx');
         }
 
         function cerrarModal() {

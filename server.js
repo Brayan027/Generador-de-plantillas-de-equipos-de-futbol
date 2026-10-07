@@ -50,10 +50,9 @@ function requireAdmin(req, res, next) {
         return next();
     }
 
-    const authHeader = req.headers['authorization'] || '';
     const token = authHeader.startsWith('Bearer ')
         ? authHeader.slice(7).trim()
-        : (req.headers['x-admin-token'] || req.query.admin_token);
+        : (req.headers['x-admin-token'] || req.query.admin_token || req.query.token);
 
     if (token && activeAdminTokens.has(token)) {
         return next();
@@ -1018,6 +1017,7 @@ app.post('/api/generar', requireAdmin, async (req, res) => {
 app.get('/api/descargar/docx', requireAdmin, (req, res) => {
     const docxPath = path.join(SALIDA_DIR, 'Carnets_Torneo.docx');
     if (fs.existsSync(docxPath)) {
+        res.setHeader('Content-Disposition', 'attachment; filename="Carnets_Torneo.docx"');
         res.download(docxPath, 'Carnets_Torneo.docx');
     } else {
         res.status(404).send('Archivo Word no encontrado.');
@@ -1027,9 +1027,16 @@ app.get('/api/descargar/docx', requireAdmin, (req, res) => {
 app.get('/api/descargar/pdf', requireAdmin, (req, res) => {
     const pdfPath = path.join(SALIDA_DIR, 'Carnets_Torneo.pdf');
     if (fs.existsSync(pdfPath)) {
+        res.setHeader('Content-Disposition', 'attachment; filename="Carnets_Torneo.pdf"');
         res.download(pdfPath, 'Carnets_Torneo.pdf');
     } else {
-        res.status(404).send('Archivo PDF no encontrado.');
+        const docxPath = path.join(SALIDA_DIR, 'Carnets_Torneo.docx');
+        if (fs.existsSync(docxPath)) {
+            res.setHeader('Content-Disposition', 'attachment; filename="Carnets_Torneo.docx"');
+            res.download(docxPath, 'Carnets_Torneo.docx');
+        } else {
+            res.status(404).send('Archivo no encontrado.');
+        }
     }
 });
 
