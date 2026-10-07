@@ -1,0 +1,3573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Planillas y Carnets - Torneo San Antonio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --dark: #0f172a;
+            --slate: #334155;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .header-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .brand-text p {
+            font-size: 12.5px;
+            color: var(--muted);
+        }
+
+        .header-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .db-status-pill {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .db-status-pill.online {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #ffffff;
+            color: var(--slate);
+            border-color: var(--border);
+        }
+        .btn-secondary:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+        .btn-danger:hover {
+            background-color: #fecaca;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-light);
+            color: #b45309;
+        }
+        .btn-warning:hover {
+            background-color: #fde68a;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* Layout */
+        main {
+            flex: 1;
+            max-width: 1440px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .tabs-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 2px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--muted);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--dark);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-dark);
+            border-bottom-color: var(--primary);
+            font-weight: 700;
+        }
+
+        .status-badge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Dropzone */
+        .dropzone {
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius);
+            padding: 22px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--primary);
+            background: #f0fdf4;
+        }
+
+        .dropzone-icon {
+            width: 48px;
+            height: 48px;
+            background: #e6fcf5;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin: 0 auto 10px;
+        }
+
+        .dropzone h3 {
+            font-size: 15.5px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #1e293b;
+        }
+
+        .dropzone p {
+            font-size: 13px;
+            color: var(--muted);
+            max-width: 650px;
+            margin: 0 auto 8px;
+            line-height: 1.4;
+        }
+
+        .dropzone .format-tip {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+        }
+        .dropzone .format-tip code {
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            background: #ffffff;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 7px 12px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 240px;
+            max-width: 360px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 13.5px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--slate);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-btn.active {
+            background: #0f172a;
+            color: white;
+            border-color: #0f172a;
+        }
+
+        /* Grid */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 16px;
+        }
+
+        .player-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: all 0.15s ease;
+        }
+
+        .player-card.disabled-team {
+            opacity: 0.65;
+            background: #fafafa;
+            border-style: dashed;
+        }
+
+        .player-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
+        }
+
+        .player-thumb-wrap {
+            width: 76px;
+            height: 92px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f1f5f9;
+            flex-shrink: 0;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .player-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .thumb-crop-badge {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.75);
+            color: white;
+            font-size: 9.5px;
+            font-weight: 700;
+            text-align: center;
+            padding: 3px 0;
+            backdrop-filter: blur(2px);
+        }
+
+        .player-fields {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .field-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 4px 8px;
+            font-size: 13px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            color: #1e293b;
+            font-weight: 600;
+            background: #f8fafc;
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .player-status-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .impreso-toggle-btn {
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .impreso-toggle-btn.impreso {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .impreso-toggle-btn.pendiente {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        .btn-qr-card {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .team-disabled-badge {
+            font-size: 10px;
+            font-weight: 700;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+            position: absolute;
+            top: 6px;
+            right: 6px;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+            background: #fee2e2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--muted);
+        }
+
+        /* Equipos Grid */
+        .equipos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .equipo-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: all 0.15s ease;
+        }
+
+        .equipo-card.disabled {
+            border-color: #fca5a5;
+            background: #fff5f5;
+        }
+
+        .equipo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .equipo-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .equipo-stats {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .equipo-stats span b {
+            color: var(--dark);
+        }
+
+        /* Switch Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Digital Carnet / Quick Register Section */
+        .carnet-module {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .carnet-module {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .search-step-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .search-big-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-big-input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        /* Preview card in app */
+        .digital-carnet-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+
+        .carnet-card-header {
+            background: #ffffff;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .carnet-card-header img {
+            width: 100%;
+            max-height: 55px;
+            object-fit: contain;
+        }
+
+        .carnet-card-body {
+            padding: 18px 16px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .carnet-card-photo {
+            width: 120px;
+            height: 140px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #10b981;
+            background: #f1f5f9;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .carnet-card-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .carnet-card-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .carnet-card-team {
+            background: #ecfdf5;
+            color: #065f46;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            border: 1px solid #a7f3d0;
+        }
+
+        .carnet-card-qr-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            width: 100%;
+        }
+
+        .carnet-card-qr-img {
+            width: 68px;
+            height: 68px;
+            background: white;
+            border-radius: 6px;
+            padding: 3px;
+            border: 1px solid #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        /* Camera / Registration Form */
+        .register-box {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .camera-container {
+            width: 100%;
+            height: 240px;
+            background: #0f172a;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-container canvas {
+            display: none;
+        }
+
+        /* Sheet Preview View */
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .sheet-page {
+            background: white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            border-radius: 2px;
+            width: 100%;
+            max-width: 1120px;
+            aspect-ratio: 11 / 8.5; /* Carta horizontal */
+            padding: 12px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #cbd5e1;
+        }
+
+        .sheet-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 12.5px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .carnets-table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .carnets-table td {
+            width: 33.333%;
+            height: 25%;
+            border: 1px solid #000000;
+            padding: 0;
+            vertical-align: top;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .carnet-box {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background: #ffffff;
+            padding: 4px 6px 6px 6px;
+            box-sizing: border-box;
+        }
+
+        .carnet-banner-img {
+            width: 100%;
+            height: 26px;
+            object-fit: fill;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .carnet-body-row {
+            display: flex;
+            gap: 6px;
+            align-items: stretch;
+            flex: 1;
+        }
+
+        .carnet-player-photo {
+            width: 65px;
+            height: 72px;
+            border: 1px solid #000000;
+            object-fit: cover;
+            object-position: top;
+            flex-shrink: 0;
+            background: #eeeeee;
+        }
+
+        .carnet-info-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            line-height: 1.15;
+            overflow: hidden;
+        }
+
+        .title-bold {
+            font-weight: bold;
+            color: #000000;
+            font-size: 9.5px;
+        }
+
+        .team-text {
+            font-size: 9.5px;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .name-label {
+            font-size: 9.5px;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 2px;
+        }
+
+        .player-name-text {
+            font-size: 9.5px;
+            color: #000000;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 480px;
+            width: 100%;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            background: #d1fae5;
+            color: #059669;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 12px;
+        }
+
+        .modal-card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #0f172a;
+        }
+
+        .modal-card p {
+            font-size: 13.5px;
+            color: var(--muted);
+            margin-bottom: 20px;
+            line-height: 1.45;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 50;
+            margin-top: 4px;
+        }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover {
+            background: #f8fafc;
+        }
+
+        .custom-loader-spinner {
+            width: 56px;
+            height: 56px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #10b981;
+            border-right: 4px solid #059669;
+            border-radius: 50%;
+            animation: spinLoader 0.8s linear infinite;
+        }
+
+        @keyframes spinLoader {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">⚽</div>
+                <div class="brand-text">
+                    <h1>Torneo San Antonio</h1>
+                    <p>Planillas, Carnets & Carnet Digital con QR</p>
+                </div>
+            </div>
+
+            <div class="header-badges">
+                <div class="db-status-pill" id="dbStatusPill">
+                    <span id="dbDot">⚪</span> <span id="dbStatusText">Comprobando MySQL...</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="sincronizarBD()" title="Respaldar todas las fotos y jugadores en la base de datos MySQL">
+                    🔄 Sincronizar BD
+                </button>
+            </div>
+
+            <div class="header-actions">
+                <a href="/" target="_blank" class="btn btn-warning" title="Abrir portal público para que los jugadores consulten su carnet o se registren">
+                    🌐 Portal Público
+                </a>
+                <button class="btn btn-secondary" onclick="abrirCarpetaFotos()" title="Abrir carpeta local de fotos">
+                    📁 Fotos
+                </button>
+                <button class="btn btn-secondary" onclick="abrirCarpetaSalida()" title="Abrir carpeta de Word y PDF">
+                    📂 Salida
+                </button>
+                <button id="btnGenerar" class="btn btn-primary" onclick="abrirModalGenerar()">
+                    <span>🚀 Generar Word & PDF</span>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="cerrarSesionAdmin()" title="Cerrar sesión de administrador">
+                    🚪 Salir
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MODAL DE LOGIN ADMINISTRADOR -->
+    <div id="adminLoginModal" style="display: flex; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: white; border-radius: 20px; max-width: 420px; width: 100%; padding: 32px 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center;">
+            <div style="width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 16px; border: 2px solid #a7f3d0;">
+                🔒
+            </div>
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+                Panel de Administración
+            </h2>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.45;">
+                Ingresa la contraseña de administrador para gestionar equipos, jugadores y carnets.
+            </p>
+
+            <form onsubmit="intentarLoginAdmin(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="position: relative;">
+                    <input type="password" id="adminPasswordInput" placeholder="Contraseña de Administrador..." required
+                        style="width: 100%; padding: 13px 44px 13px 16px; font-size: 15px; border: 2px solid #cbd5e1; border-radius: 10px; outline: none; transition: border-color 0.2s;"
+                        onfocus="this.style.borderColor='#10b981'" onblur="this.style.borderColor='#cbd5e1'">
+                    <button type="button" onclick="toggleVerPassword()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; cursor: pointer; color: #64748b;">
+                        👁️
+                    </button>
+                </div>
+                <div id="adminLoginError" style="display: none; font-size: 12.5px; color: #ef4444; font-weight: 700;"></div>
+                <button type="submit" id="btnAdminLogin" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 15px;">
+                    🔑 Entrar al Panel
+                </button>
+            </form>
+
+            <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+                <a href="/" style="font-size: 12.5px; color: #64748b; text-decoration: none; font-weight: 600;">
+                    ← Volver al Portal Público
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <!-- Tabs -->
+        <div class="tabs-bar">
+            <div class="tab-buttons">
+                <button class="tab-btn active" id="tabBtnList" onclick="setTab('list')">
+                    📋 Jugadores (<span id="countText">0</span>)
+                </button>
+                <button class="tab-btn" id="tabBtnNuevos" onclick="setTab('nuevos')" style="position: relative;">
+                    🔔 Por Aprobar (<span id="nuevosTabCount">0</span>)
+                </button>
+                <button class="tab-btn" id="tabBtnEquipos" onclick="setTab('equipos')">
+                    🏆 Equipos & Impresión (<span id="equiposCountText">0</span>)
+                </button>
+                <button class="tab-btn" id="tabBtnCarnet" onclick="setTab('carnet')">
+                    🪪 Carnet Digital & Registro Rápido
+                </button>
+                <button class="tab-btn" id="tabBtnPreview" onclick="setTab('preview')">
+                    📄 Vista Previa de Hojas (<span id="pagesCountText">0 hojas</span>)
+                </button>
+            </div>
+            <div class="status-badge" id="statusBadge">
+                ✨ 12 carnets homogéneos por hoja horizontal
+            </div>
+        </div>
+
+        <!-- View 1: Jugadores -->
+        <div id="viewList" style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Banner Alerta de Nuevos Registros Pendientes -->
+            <div id="bannerNuevosPendientes" style="display: none; background: #fffbeb; border: 2px solid #fcd34d; border-radius: 12px; padding: 12px 18px; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 24px;">🔔</span>
+                    <div>
+                        <div style="color: #92400e; font-size: 14px; font-weight: 800;">Nuevos registros pendientes de aprobación</div>
+                        <div style="color: #b45309; font-size: 12.5px;" id="bannerNuevosTexto">Hay jugadores del portal esperando que los aceptes en el torneo.</div>
+                    </div>
+                </div>
+                <button class="btn btn-warning btn-sm" onclick="setTab('nuevos')" style="font-weight: 800; white-space: nowrap; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);">
+                    👉 Revisar y Aceptar
+                </button>
+            </div>
+
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                <div class="dropzone-icon">📥</div>
+                <h3>Arrastra y suelta aquí las fotos de WhatsApp</h3>
+                <p>O haz clic para seleccionar fotos. Se guardan y sincronizan automáticamente con MySQL.</p>
+                <div class="format-tip">
+                    💡 Formato de archivo: <code>nombre equipo - nombre jugador.jpg</code> (ej: <b>cobradores - jose gonzalez.jpg</b>)
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="searchInput" placeholder="Buscar jugador o equipo..." oninput="filterPlayers()">
+                </div>
+
+                <div class="filter-group">
+                    <button class="filter-btn active" id="filterBtnAll" onclick="setFilter('all')">
+                        Todos (<span id="countAll">0</span>)
+                    </button>
+                    <button class="filter-btn" id="filterBtnPendientes" onclick="setFilter('pendientes')">
+                        ⏳ Pendientes (<span id="countPendientes">0</span>)
+                    </button>
+                    <button class="filter-btn" id="filterBtnImpresos" onclick="setFilter('impresos')">
+                        🖨️ Impresos (<span id="countImpresos">0</span>)
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-warning btn-sm" onclick="abrirModalEquipos()" title="Ver lista de equipos para inhabilitar o habilitar para impresión" style="font-weight: 700;">
+                        🏆 Inhabilitar / Habilitar Equipos (<span id="btnEquiposInactivosCount">0 inactivos</span>)
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="marcarTodos(true)" title="Marcar todos los jugadores visibles como ya impresos">
+                        ✅ Marcar Todos Impresos
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="marcarTodos(false)" title="Marcar todos los jugadores como pendientes de imprimir">
+                        ⏳ Marcar Todos Pendientes
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="cargarJugadores()">
+                        🔄 Refrescar
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="limpiarTodo()">
+                        🗑️ Vaciar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Banner visible si hay equipos inhabilitados -->
+            <div id="bannerEquiposInhabilitados" style="display: none; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #9f1239; align-items: center; justify-content: space-between;">
+                <div>
+                    <span>⚠️ <b>Aviso:</b> Hay <b id="bannerEquiposCount">0</b> equipo(s) inhabilitados. Los jugadores de esos equipos no saldrán en la impresión.</span>
+                </div>
+                <button class="btn btn-sm btn-secondary" onclick="abrirModalEquipos()">
+                    Ver y Habilitar Equipos
+                </button>
+            </div>
+
+            <div class="players-grid" id="playersGrid"></div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div style="font-size: 44px; margin-bottom: 8px;">⚽</div>
+                <h3>No hay jugadores para mostrar</h3>
+                <p>Arrastra fotos a la caja superior o utiliza la pestaña de Registro Rápido.</p>
+            </div>
+        </div>
+
+        <!-- View 5: Nuevos Registros por Aprobar -->
+        <div id="viewNuevos" style="display: none; flex-direction: column; gap: 16px;">
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                        <span>🔔</span> Solicitudes de Registro del Portal Público
+                        <span id="nuevosCounterPill" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 800;">0 pendientes</span>
+                    </h2>
+                    <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">
+                        Revisa los jugadores registrados desde su celular. Pulsa en <b>"✅ Aceptar"</b> para agregarlos al torneo y habilitar su carnet para impresión, o <b>"❌ Rechazar"</b> si la información o foto es inválida.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn btn-primary" onclick="aprobarTodosLosPendientes()" id="btnAprobarTodos" style="display: none;">
+                        ✅ Aceptar Todos (<span id="countAprobarTodos">0</span>)
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="cargarPendientesAprobacion()">
+                        🔄 Actualizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor de Tarjetas de Nuevos Registros -->
+            <div id="nuevosListContainer" class="players-grid"></div>
+
+            <!-- Estado Vacío -->
+            <div id="nuevosEmptyState" class="empty-state" style="display: none; padding: 48px 20px; text-align: center; background: white; border-radius: var(--radius); border: 1px dashed var(--border);">
+                <div style="font-size: 48px; margin-bottom: 12px;">🎉</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">No hay registros pendientes de aprobación</h3>
+                <p style="font-size: 13.5px; color: var(--muted); max-width: 440px; margin: 0 auto 16px;">
+                    Todos los jugadores registrados han sido aceptados. Cuando alguien se registre en el portal público aparecerá aquí al instante para que le des en aceptar.
+                </p>
+                <a href="/portal" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; width: auto;">
+                    🌐 Ver Portal Público
+                </a>
+            </div>
+        </div>
+
+        <!-- View 2: Equipos & Impresión (CRUD) -->
+        <div id="viewEquipos" style="display: none; flex-direction: column; gap: 16px;">
+            <!-- Header Card -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                        <span>🏆</span> Gestión de Equipos & Control de Impresión
+                        <span id="equiposBadgeTotal" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 12px;">0 equipos</span>
+                    </h2>
+                    <p style="font-size: 13px; color: var(--muted); margin: 0;">
+                        Crea nuevos equipos, edita sus nombres, habilita/inhabilita su impresión o elimínalos del torneo.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                    <button class="btn btn-primary" onclick="abrirModalCrearEquipo()" style="font-weight: 700;">
+                        ➕ Nuevo Equipo
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleTodosEquipos(true)">
+                        ✅ Habilitar Todos
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleTodosEquipos(false)">
+                        🚫 Inhabilitar Todos
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="cargarEquipos()">
+                        🔄 Refrescar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Toolbar de Búsqueda y Filtros -->
+            <div class="toolbar" style="padding: 10px 16px;">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="searchEquiposInput" placeholder="Buscar equipo..." oninput="filtrarEquiposView()">
+                </div>
+                <div class="filter-group">
+                    <button class="filter-btn active" id="filterEqAll" onclick="setFiltroEquipos('all')">
+                        Todos (<span id="countEqAll">0</span>)
+                    </button>
+                    <button class="filter-btn" id="filterEqHabilitados" onclick="setFiltroEquipos('habilitados')">
+                        ✅ Habilitados (<span id="countEqHabilitados">0</span>)
+                    </button>
+                    <button class="filter-btn" id="filterEqInhabilitados" onclick="setFiltroEquipos('inhabilitados')">
+                        🚫 Inhabilitados (<span id="countEqInhabilitados">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <div class="equipos-grid" id="equiposGrid"></div>
+
+            <div class="empty-state" id="emptyEquiposState" style="display: none;">
+                <div style="font-size: 44px; margin-bottom: 8px;">🛡️</div>
+                <h3>No se encontraron equipos</h3>
+                <p>Haz clic en "<b>➕ Nuevo Equipo</b>" para registrar uno nuevo o ajusta el término de búsqueda.</p>
+            </div>
+        </div>
+
+        <!-- View 3: Carnet Digital & Registro Rápido -->
+        <div id="viewCarnet" style="display: none;" class="carnet-module">
+            <!-- Columna Izquierda: Búsqueda y Formulario -->
+            <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div class="search-step-card">
+                    <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                        <span>🔍</span> 1. Buscar Jugador por Nombre
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-top: -6px;">
+                        Escribe el nombre completo o parte de él. Si ya está registrado verás su carnet con QR, o podrás registrarlo inmediatamente.
+                    </p>
+                    <div style="position: relative;">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="carnetSearchInput" class="search-big-input" placeholder="Ej: Pedro Martinez..." maxlength="40" autocomplete="off" oninput="onCarnetSearchInput(event)" onkeydown="if(event.key==='Enter') buscarSiguienteCarnet()">
+                            <button class="btn btn-primary" id="btnBuscarSiguienteCarnet" onclick="buscarSiguienteCarnet()">
+                                Siguiente ➡️
+                            </button>
+                        </div>
+                        <div id="carnetSearchSuggestions" class="autocomplete-dropdown" style="display: none;"></div>
+                        <div id="carnetSearchError" style="display: none; color: #dc2626; font-size: 12.5px; font-weight: 600; margin-top: 6px;"></div>
+                    </div>
+                </div>
+
+                <!-- Formulario de Registro Rápido (Se muestra si no existe) -->
+                <div class="register-box" id="registerBox" style="display: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; margin: 0;">
+                            <span>📝</span> Registrar Nuevo Jugador
+                        </h3>
+                        <span style="font-size: 11.5px; background: #e0f2fe; color: #0369a1; padding: 3px 10px; border-radius: 12px; font-weight: 700;">Alta Inmediata</span>
+                    </div>
+                    <p style="font-size: 12.5px; color: var(--muted); margin-top: -2px;">
+                        Este jugador no está registrado aún. Completa su equipo y toma o sube su foto:
+                    </p>
+
+                    <div class="field-group">
+                        <label class="field-label">Nombre Completo *</label>
+                        <input type="text" id="regNombre" class="field-input" placeholder="Nombre y Apellidos" maxlength="40">
+                        <div id="regNombreError" style="display: none; color: #dc2626; font-size: 11.5px; font-weight: 600; margin-top: 3px;">⚠️ Por favor ingresa el nombre del jugador.</div>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Equipo *</label>
+                        <input type="text" id="regEquipo" class="field-input" list="equiposDatalist" placeholder="Selecciona o escribe el equipo" maxlength="35">
+                        <datalist id="equiposDatalist"></datalist>
+                        <div id="regEquipoError" style="display: none; color: #dc2626; font-size: 11.5px; font-weight: 600; margin-top: 3px;">⚠️ Por favor selecciona o escribe el equipo.</div>
+                    </div>
+
+                    <!-- Métodos de foto -->
+                    <div>
+                        <label class="field-label" style="margin-bottom: 6px; display: block;">Foto del Jugador *</label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btnModoCamara" onclick="setModoFoto('camara')">
+                                📸 Tomar con Cámara
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btnModoArchivo" onclick="setModoFoto('archivo')">
+                                📁 Cargar Archivo
+                            </button>
+                        </div>
+
+                        <div id="seccionSinSeleccion" style="padding: 20px; border: 2px dashed #cbd5e1; border-radius: 10px; text-align: center; background: #f8fafc;">
+                            <div style="font-size: 26px; margin-bottom: 4px;">📷</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #334155;">Selecciona cómo deseas agregar la foto</div>
+                            <div style="font-size: 11.5px; color: var(--muted);">Elige tomar foto con cámara o cargar archivo</div>
+                        </div>
+
+                        <!-- Sección Cámara -->
+                        <div id="seccionCamara" style="display: none;">
+                            <div class="camera-container" id="cameraBox">
+                                <video id="camVideo" autoplay playsinline></video>
+                                <canvas id="camCanvas"></canvas>
+                            </div>
+                            <div style="display: flex; gap: 8px; justify-content: center; margin-top: 10px;">
+                                <button type="button" class="btn btn-primary btn-sm" id="btnCapturarFoto" onclick="capturarFotoCamara()">
+                                    📸 Capturar Foto
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btnReintentarCamara" onclick="iniciarCamara()" style="display: none;">
+                                    🔄 Reintentar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sección Archivo -->
+                        <div id="seccionArchivo" style="display: none;">
+                            <input type="file" id="regFileInput" accept="image/*" onchange="previewArchivoFoto(event)" style="margin-bottom: 8px;">
+                            <div id="filePreviewBox" style="width: 100px; height: 120px; border-radius: 8px; border: 1px dashed #cbd5e1; overflow: hidden; display: none;">
+                                <img id="filePreviewImg" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        </div>
+                        <div id="regFotoError" style="display: none; color: #dc2626; font-size: 12px; font-weight: 600; text-align: center; margin-top: 6px;">⚠️ Por favor toma o selecciona una foto antes de guardar.</div>
+                    </div>
+
+                    <button class="btn btn-primary" id="btnGuardarRegistro" onclick="guardarRegistroRapido()" style="justify-content: center; margin-top: 6px;">
+                        💾 Guardar y Generar Carnet Oficial
+                    </button>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Vista Previa del Carnet Digital Oficial con QR -->
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 16px;">
+                <div id="carnetPlaceholder" style="text-align: center; color: var(--muted); padding: 50px 20px;">
+                    <div style="font-size: 46px; margin-bottom: 12px;">🪪</div>
+                    <h3 style="font-size: 16px; color: var(--dark); margin-bottom: 6px;">Vista Previa de Carnet Digital</h3>
+                    <p style="font-size: 13px;">Busca un jugador o registra uno nuevo para ver su carnet estilo oficial y su código QR para teléfonos móviles.</p>
+                </div>
+
+                <div id="digitalCarnetResult" style="display: none; width: 100%; max-width: 380px;">
+                    <div class="digital-carnet-card">
+                        <div class="carnet-card-header">
+                            <img src="/banner.png" alt="Torneo San Antonio">
+                        </div>
+                        <div class="carnet-card-body">
+                            <div class="carnet-card-photo">
+                                <img id="dispPhoto" src="" alt="Foto Jugador">
+                            </div>
+                            <div class="carnet-card-name" id="dispName">PEDRO GONZALEZ</div>
+                            <div class="carnet-card-team" id="dispTeam">EQUIPO</div>
+                            
+                            <div class="carnet-card-qr-box">
+                                <img id="dispQr" class="carnet-card-qr-img" src="" alt="Código QR">
+                                <div style="text-align: left; flex: 1;">
+                                    <div style="font-size: 12px; font-weight: 700; color: #0f172a;">Código QR Oficial</div>
+                                    <div style="font-size: 11px; color: var(--muted); line-height: 1.3;">Escanéalo con cualquier celular para ver el carnet verificado.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; width: 100%;">
+                        <a id="btnAbrirCarnetWeb" href="#" target="_blank" class="btn btn-primary" style="justify-content: center;">
+                            📲 Abrir Carnet en Celular / Web
+                        </a>
+                        <div style="display: flex; gap: 8px;">
+                            <a id="btnDescargarQr" href="#" download="QR_Carnet.png" class="btn btn-secondary" style="flex: 1; justify-content: center;">
+                                📥 Descargar QR
+                            </a>
+                            <button id="btnToggleImpresoCarnet" class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="toggleImpresoDesdeCarnet()">
+                                🖨️ Alternar Impreso
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 4: Sheet Print Preview -->
+        <div id="viewPreview" style="display: none;" class="preview-container">
+            <div id="sheetPages" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+        </div>
+    </main>
+
+    <!-- Modal de Configuración antes de Generar -->
+    <div class="modal-overlay" id="generateModal">
+        <div class="modal-card" style="text-align: left;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <h2 style="font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>🚀</span> Generar Word & PDF
+                </h2>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalGenerar()">✕</button>
+            </div>
+            <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+                Elige qué jugadores deseas incluir en la planilla de impresión:
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px;">
+                <label style="display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: #f8fafc;">
+                    <input type="radio" name="genMode" value="pendientes" checked style="margin-top: 3px;">
+                    <div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">
+                            ⏳ Solo jugadores pendientes (<span id="modalCountPendientes">0</span>)
+                        </div>
+                        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+                            Ideal cuando vas agregando jugadores nuevos y no quieres reimprimir los que ya imprimiste.
+                        </div>
+                    </div>
+                </label>
+
+                <label style="display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: #f8fafc;">
+                    <input type="radio" name="genMode" value="todos" style="margin-top: 3px;">
+                    <div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">
+                            👥 Todos los jugadores de equipos habilitados (<span id="modalCountHabilitados">0</span>)
+                        </div>
+                        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+                            Genera la planilla completa de todos los equipos marcados como habilitados.
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Lista de equipos con casillas para desmarcar o marcar equipos completos -->
+                <div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: #ffffff;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 700; color: #0f172a;">
+                            🏆 Equipos que se imprimirán (<span id="genEquiposHabilitadosText">0 habilitados</span>):
+                        </span>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleTodosEquipos(true)" style="padding: 2px 8px; font-size: 11px;">Habilitar Todos</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleTodosEquipos(false)" style="padding: 2px 8px; font-size: 11px;">Inhabilitar Todos</button>
+                        </div>
+                    </div>
+                    <div id="genEquiposCheckboxes" style="max-height: 160px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px;">
+                    </div>
+                </div>
+
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #334155; margin-top: 4px;">
+                    <input type="checkbox" id="modalAutoMarcar" checked>
+                    <span>Marcar automáticamente como impresos al terminar de generar</span>
+                </label>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalGenerar()">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarGenerar" onclick="ejecutarGeneracion()">
+                    🚀 Iniciar Generación
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Rápido de Gestión de Equipos -->
+    <div class="modal-overlay" id="modalEquipos">
+        <div class="modal-card" style="max-width: 640px; width: 95%; text-align: left; max-height: 85vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>🏆</span> Inhabilitar / Habilitar Equipos para Impresión
+                </h2>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalEquipos()">✕</button>
+            </div>
+            <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+                Desmarca el interruptor de los equipos que <b>NO deseas imprimir</b>. También puedes añadir nuevos equipos o editarlos.
+            </p>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" onclick="cerrarModalEquipos(); abrirModalCrearEquipo();">➕ Nuevo Equipo</button>
+                <button class="btn btn-secondary btn-sm" onclick="toggleTodosEquipos(true)">✅ Habilitar Todos</button>
+                <button class="btn btn-secondary btn-sm" onclick="toggleTodosEquipos(false)">🚫 Inhabilitar Todos</button>
+            </div>
+            <div id="modalEquiposList" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; max-height: 380px; padding-right: 4px;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
+                <button class="btn btn-primary" onclick="cerrarModalEquipos()">Listo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear / Modificar Equipo -->
+    <div class="modal-overlay" id="modalEquipoForm">
+        <div class="modal-card" style="max-width: 500px; width: 95%; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h2 style="font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span id="modalEquipoFormIcon">➕</span> <span id="modalEquipoFormTitle">Nuevo Equipo</span>
+                </h2>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalEquipoForm()">✕</button>
+            </div>
+            
+            <form id="formEquipo" onsubmit="guardarFormEquipo(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <input type="hidden" id="equipoEditOriginalName" value="">
+                
+                <div class="field-group">
+                    <label class="field-label" style="font-size: 11.5px; margin-bottom: 4px;">NOMBRE DEL EQUIPO *</label>
+                    <input type="text" id="equipoInputNombre" class="field-input" placeholder="Ej: Cobradores FC, Barcelona..." maxlength="35" required style="font-size: 14px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <small style="color: var(--muted); font-size: 11.5px; margin-top: 3px;" id="equipoFormHelpText">
+                        El nombre se formateará automáticamente con iniciales mayúsculas (Title Case).
+                    </small>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">Habilitado para Impresión</div>
+                        <div style="font-size: 11.5px; color: var(--muted);">Si está desmarcado, sus carnets se omitirán al generar Word/PDF.</div>
+                    </div>
+                    <label class="switch" style="margin: 0;">
+                        <input type="checkbox" id="equipoInputHabilitado" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div id="equipoFormRenombrarWarning" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #1e40af;">
+                    ℹ️ <b>Actualización automática:</b> Al modificar el nombre del equipo, todos sus jugadores registrados y las fotos asociadas se actualizarán automáticamente.
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalEquipoForm()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardarEquipo">💾 Guardar Equipo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Confirmar Eliminación de Equipo -->
+    <div class="modal-overlay" id="modalEliminarEquipo">
+        <div class="modal-card" style="max-width: 500px; width: 95%; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="font-size: 18px; margin: 0; color: #dc2626; display: flex; align-items: center; gap: 8px;">
+                    <span>🗑️</span> Eliminar Equipo
+                </h2>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalEliminarEquipo()">✕</button>
+            </div>
+            
+            <div id="modalEliminarEquipoBody" style="font-size: 13.5px; color: #334155; line-height: 1.5; margin-bottom: 16px;">
+                <!-- Rellenado dinámicamente -->
+            </div>
+
+            <input type="hidden" id="eliminarEquipoNombre" value="">
+            <input type="hidden" id="eliminarEquipoTotalJugadores" value="0">
+
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalEliminarEquipo()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminarEquipo" onclick="ejecutarEliminarEquipo()">
+                    🗑️ Eliminar Definitivamente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Procesamiento / Cargando al Generar o Registrar -->
+    <div class="modal-overlay" id="loadingModal">
+        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 32px 24px;">
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                <div class="custom-loader-spinner"></div>
+            </div>
+            <h2 id="loadingModalTitle" style="font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
+                Generando Carnets...
+            </h2>
+            <p id="loadingModalSubtitle" style="font-size: 13.5px; color: var(--muted); margin-bottom: 20px; line-height: 1.5;">
+                Componiendo documento Word y exportando a PDF. Por favor no cierres la ventana.
+            </p>
+            <div id="loadingModalSteps" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; text-align: left; font-size: 12.5px; color: #475569; display: flex; flex-direction: column; gap: 8px;">
+                <div id="stepInfo1" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="step-dot" style="background: #10b981;"></span>
+                    <span>Procesando jugadores de equipos habilitados...</span>
+                </div>
+                <div id="stepInfo2" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="step-dot" style="background: #3b82f6;"></span>
+                    <span>Creando planilla Word oficial (.docx)...</span>
+                </div>
+                <div id="stepInfo3" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="step-dot" style="background: #f59e0b;"></span>
+                    <span>Exportando a PDF horizontal con Word COM...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-card">
+            <div class="modal-icon">✅</div>
+            <h2>¡Planilla Generada con Éxito!</h2>
+            <p id="modalDesc">Tus carnets están listos con el diseño exacto en Word y PDF.</p>
+            
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="abrirArchivo('pdf')" style="justify-content: center;">
+                    📑 Abrir Documento PDF
+                </button>
+                <button class="btn btn-secondary" onclick="abrirArchivo('docx')" style="justify-content: center;">
+                    📄 Abrir en Microsoft Word (.docx)
+                </button>
+                <button class="btn btn-secondary" onclick="abrirCarpetaSalida()" style="justify-content: center;">
+                    📂 Ver en la Carpeta
+                </button>
+                <button class="btn" onclick="cerrarModal()" style="color: var(--muted); margin-top: 6px;">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recorte y Ajuste de Foto -->
+    <div class="modal-overlay" id="cropModal">
+        <div class="modal-card" style="max-width: 620px; width: 95%; text-align: left; padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>✂️</span> <span id="cropModalTitle">Ajustar y Centrar Foto</span>
+                </h2>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalRecorte()">✕</button>
+            </div>
+            <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+                Arrastra el recuadro verde para colocar la cara del jugador en el centro. Usa las esquinas o botones para agrandar o achicar el área del carnet.
+            </p>
+            
+            <div id="cropContainer" style="position: relative; width: 100%; height: 380px; background: #0b1120; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; user-select: none;">
+                <canvas id="cropCanvas" style="max-width: 100%; max-height: 100%; cursor: move;"></canvas>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="zoomCrop(-0.1)" title="Acercar encuadre">🔍 + Zoom</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="zoomCrop(0.1)" title="Alejar encuadre">🔍 - Zoom</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="autoCentrarCrop()" title="Centrar al medio">🎯 Centrar</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalRecorte()">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarRecorte" onclick="guardarRecorte()">💾 Guardar Recorte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interceptor de Fetch para Autenticación de Administrador
+        const origFetch = window.fetch;
+        window.fetch = async function(url, options = {}) {
+            options = options || {};
+            options.headers = options.headers || {};
+            const token = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+            if (token) {
+                if (options.headers instanceof Headers) {
+                    options.headers.set('Authorization', `Bearer ${token}`);
+                } else if (Array.isArray(options.headers)) {
+                    options.headers.push(['Authorization', `Bearer ${token}`]);
+                } else {
+                    options.headers['Authorization'] = `Bearer ${token}`;
+                }
+            }
+            const res = await origFetch(url, options);
+            if (res.status === 401 && !url.includes('/api/admin/login')) {
+                mostrarLoginModal(true);
+            }
+            return res;
+        };
+
+        function mostrarLoginModal(showError = false) {
+            const modal = document.getElementById('adminLoginModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                const input = document.getElementById('adminPasswordInput');
+                if (input) {
+                    input.value = '';
+                    input.focus();
+                }
+                const errDiv = document.getElementById('adminLoginError');
+                if (errDiv) {
+                    errDiv.style.display = showError ? 'block' : 'none';
+                    if (showError) errDiv.textContent = 'Acceso no autorizado o sesión expirada.';
+                }
+            }
+        }
+
+        function ocultarLoginModal() {
+            const modal = document.getElementById('adminLoginModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function intentarLoginAdmin(e) {
+            if (e) e.preventDefault();
+            const pwd = document.getElementById('adminPasswordInput').value.trim();
+            const errDiv = document.getElementById('adminLoginError');
+            const btn = document.getElementById('btnAdminLogin');
+            if (!pwd) return;
+
+            btn.disabled = true;
+            btn.innerHTML = 'Verificando...';
+            errDiv.style.display = 'none';
+
+            try {
+                const res = await origFetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pwd })
+                });
+                const data = await res.json();
+                if (data.success && data.token) {
+                    localStorage.setItem('admin_token', data.token);
+                    ocultarLoginModal();
+                    // Cargar datos del panel
+                    checkDBStatus();
+                    cargarJugadores();
+                    cargarEquipos();
+                    cargarPendientesAprobacion();
+                } else {
+                    errDiv.textContent = data.error || 'Contraseña incorrecta';
+                    errDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errDiv.textContent = 'Error al comunicarse con el servidor.';
+                errDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔑 Entrar al Panel';
+            }
+        }
+
+        function cerrarSesionAdmin() {
+            const token = localStorage.getItem('admin_token');
+            if (token) {
+                origFetch('/api/admin/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).catch(() => {});
+            }
+            localStorage.removeItem('admin_token');
+            sessionStorage.removeItem('admin_token');
+            mostrarLoginModal(false);
+        }
+
+        function toggleVerPassword() {
+            const inp = document.getElementById('adminPasswordInput');
+            if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+        }
+
+        let allPlayers = [];
+        let allEquipos = [];
+        let pendingPlayers = [];
+        let currentTab = 'list';
+        let currentFilter = 'all'; // 'all', 'pendientes', 'impresos'
+        let currentSelectedPlayer = null;
+        let mediaStream = null;
+        let capturedPhotoBase64 = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (typeof setupDropzone === 'function') setupDropzone();
+                if (typeof setupCropListeners === 'function') setupCropListeners();
+            } catch (err) {
+                console.warn("Init listeners error:", err);
+            }
+
+            // Si pasa la contraseña en la URL (?clave=SUPERV1S0R o ?pass=SUPERV1S0R)
+            const urlParams = new URLSearchParams(window.location.search);
+            const claveParam = urlParams.get('clave') || urlParams.get('pass') || urlParams.get('password');
+            if (claveParam) {
+                const inp = document.getElementById('adminPasswordInput');
+                if (inp) inp.value = claveParam;
+                await intentarLoginAdmin();
+                return;
+            }
+
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                mostrarLoginModal(false);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/admin/verificar', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success && data.valid) {
+                    ocultarLoginModal();
+                    checkDBStatus();
+                    cargarJugadores();
+                    cargarEquipos();
+                    cargarPendientesAprobacion();
+                } else {
+                    mostrarLoginModal(false);
+                }
+            } catch (e) {
+                mostrarLoginModal(false);
+            }
+        });
+
+        // ----------------- TABS -----------------
+        function setTab(tab) {
+            currentTab = tab;
+            document.getElementById('tabBtnList').classList.toggle('active', tab === 'list');
+            document.getElementById('tabBtnNuevos').classList.toggle('active', tab === 'nuevos');
+            document.getElementById('tabBtnEquipos').classList.toggle('active', tab === 'equipos');
+            document.getElementById('tabBtnCarnet').classList.toggle('active', tab === 'carnet');
+            document.getElementById('tabBtnPreview').classList.toggle('active', tab === 'preview');
+
+            document.getElementById('viewList').style.display = tab === 'list' ? 'flex' : 'none';
+            document.getElementById('viewNuevos').style.display = tab === 'nuevos' ? 'flex' : 'none';
+            document.getElementById('viewEquipos').style.display = tab === 'equipos' ? 'flex' : 'none';
+            document.getElementById('viewCarnet').style.display = tab === 'carnet' ? 'grid' : 'none';
+            document.getElementById('viewPreview').style.display = tab === 'preview' ? 'flex' : 'none';
+
+            if (tab === 'nuevos') {
+                cargarPendientesAprobacion();
+            } else if (tab === 'preview') {
+                renderSheetPreview();
+            } else if (tab === 'equipos') {
+                cargarEquipos();
+            } else if (tab !== 'carnet') {
+                detenerCamara();
+            }
+        }
+
+        // ----------------- GESTIÓN Y APROBACIÓN DE REGISTROS -----------------
+        async function cargarPendientesAprobacion() {
+            try {
+                const res = await fetch('/api/jugadores/pendientes-aprobacion');
+                const data = await res.json();
+                if (data.success) {
+                    pendingPlayers = data.pendientes || [];
+                    const total = data.total || 0;
+
+                    // Actualizar badges y contadores
+                    document.getElementById('nuevosTabCount').textContent = total;
+                    document.getElementById('nuevosCounterPill').textContent = `${total} pendiente${total === 1 ? '' : 's'}`;
+
+                    // Banner de alerta en pestaña principal
+                    const banner = document.getElementById('bannerNuevosPendientes');
+                    const bannerTxt = document.getElementById('bannerNuevosTexto');
+                    const tabBtn = document.getElementById('tabBtnNuevos');
+
+                    if (total > 0) {
+                        banner.style.display = 'flex';
+                        bannerTxt.textContent = `Hay ${total} jugador(es) del portal esperando que los aceptes en el torneo.`;
+                        tabBtn.style.color = '#b45309';
+                        tabBtn.style.fontWeight = '800';
+                    } else {
+                        banner.style.display = 'none';
+                        tabBtn.style.color = '';
+                        tabBtn.style.fontWeight = '';
+                    }
+
+                    // Botón Aprobar Todos
+                    const btnTodos = document.getElementById('btnAprobarTodos');
+                    const countTodos = document.getElementById('countAprobarTodos');
+                    if (total > 1) {
+                        btnTodos.style.display = 'inline-flex';
+                        countTodos.textContent = total;
+                    } else {
+                        btnTodos.style.display = 'none';
+                    }
+
+                    renderNuevosRegistros(pendingPlayers);
+                }
+            } catch (err) {
+                console.error("Error al cargar solicitudes pendientes:", err);
+            }
+        }
+
+        function renderNuevosRegistros(lista) {
+            const container = document.getElementById('nuevosListContainer');
+            const emptyState = document.getElementById('nuevosEmptyState');
+            if (!container) return;
+
+            if (!lista || lista.length === 0) {
+                container.innerHTML = '';
+                if (emptyState) emptyState.style.display = 'block';
+                return;
+            }
+
+            if (emptyState) emptyState.style.display = 'none';
+
+            container.innerHTML = lista.map(p => `
+                <div class="player-card" style="border: 2px solid #fcd34d; background: #fffdf5; position: relative;">
+                    <div style="position: absolute; top: 10px; right: 10px; z-index: 5;">
+                        <span style="background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 12px; border: 1px solid #fde68a; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            ⏳ POR APROBAR
+                        </span>
+                    </div>
+
+                    <div class="player-thumb-wrap" onclick="abrirModalRecorte('${escapeHtml(p.filename)}', '${p.url}')" title="Clic para recortar o centrar el rostro">
+                        <img src="${p.urlCarnet || p.url}" alt="${escapeHtml(p.nombre)}" class="player-thumb" loading="lazy">
+                        <div class="thumb-crop-badge">✂️ Ajustar</div>
+                    </div>
+
+                    <div class="player-fields">
+                        <div class="field-group">
+                            <label class="field-label">EQUIPO</label>
+                            <input type="text" class="field-input" value="${escapeHtml(p.equipo)}" maxlength="35"
+                                   onchange="actualizarJugador('${escapeHtml(p.filename)}', this.value, null)">
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">NOMBRE DEL JUGADOR</label>
+                            <input type="text" class="field-input" value="${escapeHtml(p.nombre)}" maxlength="40"
+                                   onchange="actualizarJugador('${escapeHtml(p.filename)}', null, this.value)">
+                        </div>
+
+                        <div style="font-size: 11.5px; color: #94a3b8; margin-top: -2px;">
+                            📅 ${p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Registrado recientemente'}
+                        </div>
+
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <button type="button" class="btn btn-primary" onclick="aprobarRegistro('${escapeHtml(p.filename)}', '${escapeHtml(p.nombre)}')" style="flex: 1; padding: 10px 14px; font-size: 13.5px; justify-content: center; box-shadow: 0 3px 8px rgba(16, 185, 129, 0.35);">
+                                ✅ Aceptar
+                            </button>
+                            <button type="button" class="btn" onclick="rechazarRegistro('${escapeHtml(p.filename)}', '${escapeHtml(p.nombre)}')" style="padding: 10px 14px; font-size: 13.5px; background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; justify-content: center;" title="Rechazar y descartar registro">
+                                ✕ Rechazar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function aprobarRegistro(filename, nombre) {
+            try {
+                const res = await fetch('/api/jugador/aprobar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                    await cargarEquipos();
+                    await cargarPendientesAprobacion();
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo aprobar'));
+                }
+            } catch (err) {
+                alert('Error al aprobar: ' + err.message);
+            }
+        }
+
+        async function aprobarTodosLosPendientes() {
+            if (!confirm(`¿Aceptar y habilitar todos los ${pendingPlayers.length} registros pendientes en el torneo?`)) return;
+            try {
+                const res = await fetch('/api/jugadores/aprobar-todos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                    await cargarEquipos();
+                    await cargarPendientesAprobacion();
+                    alert('✅ Todos los jugadores han sido aceptados con éxito.');
+                }
+            } catch (err) {
+                alert('Error al aprobar todos: ' + err.message);
+            }
+        }
+
+        async function rechazarRegistro(filename, nombre) {
+            if (!confirm(`¿Estás seguro de que deseas rechazar y descartar el registro de "${nombre}"? Se eliminará su foto y registro.`)) return;
+            try {
+                const res = await fetch('/api/jugador/rechazar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                    await cargarEquipos();
+                    await cargarPendientesAprobacion();
+                }
+            } catch (err) {
+                alert('Error al rechazar: ' + err.message);
+            }
+        }
+
+        // ----------------- DB STATUS & SYNC -----------------
+        async function checkDBStatus() {
+            const pill = document.getElementById('dbStatusPill');
+            const dot = document.getElementById('dbDot');
+            const txt = document.getElementById('dbStatusText');
+
+            try {
+                const res = await fetch('/api/status-db');
+                const data = await res.json();
+                if (data.success && data.status && data.status.connected) {
+                    pill.classList.add('online');
+                    dot.textContent = '🟢';
+                    txt.textContent = `MySQL Conectado (${data.status.user})`;
+                } else {
+                    pill.classList.remove('online');
+                    dot.textContent = '🔴';
+                    txt.textContent = 'MySQL Desconectado';
+                }
+            } catch (err) {
+                pill.classList.remove('online');
+                dot.textContent = '🔴';
+                txt.textContent = 'Sin conexión a BD';
+            }
+        }
+
+        async function sincronizarBD() {
+            try {
+                const res = await fetch('/api/sincronizar-bd', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ Sincronización exitosa:\n• Total Archivos: ${data.resultado.totalArchivos}\n• Insertados: ${data.resultado.insertados}\n• Actualizados: ${data.resultado.actualizados}`);
+                    await checkDBStatus();
+                    await cargarJugadores();
+                    await cargarEquipos();
+                } else {
+                    alert('Error al sincronizar: ' + data.error);
+                }
+            } catch (err) {
+                alert('Error al sincronizar: ' + err.message);
+            }
+        }
+
+        // ----------------- CARGA DE DATOS -----------------
+        async function cargarJugadores() {
+            try {
+                const res = await fetch('/api/jugadores');
+                const data = await res.json();
+                if (data.success) {
+                    allPlayers = data.jugadores || [];
+                    updateCounters();
+                    filterPlayers();
+                    cargarPendientesAprobacion();
+                }
+            } catch (err) {
+                console.error("Error al cargar jugadores:", err);
+            }
+        }
+
+        async function cargarEquipos() {
+            try {
+                const res = await fetch('/api/equipos');
+                const data = await res.json();
+                if (data.success) {
+                    allEquipos = data.equipos || [];
+                    document.getElementById('equiposCountText').textContent = allEquipos.length;
+                    renderEquipos(allEquipos);
+
+                    // Poblar datalist de registro
+                    const datalist = document.getElementById('equiposDatalist');
+                    if (datalist) {
+                        datalist.innerHTML = allEquipos.map(e => `<option value="${escapeHtml(e.nombre)}">`).join('');
+                    }
+                }
+            } catch (err) {
+                console.error("Error al cargar equipos:", err);
+            }
+        }
+
+        function updateCounters() {
+            const count = allPlayers.length;
+            const pendientes = allPlayers.filter(p => !p.impreso).length;
+            const impresos = allPlayers.filter(p => p.impreso).length;
+
+            document.getElementById('countText').textContent = count;
+            document.getElementById('countAll').textContent = count;
+            document.getElementById('countPendientes').textContent = pendientes;
+            document.getElementById('countImpresos').textContent = impresos;
+
+            const equipos = new Set(allPlayers.map(p => p.equipo)).size;
+            const pages = Math.ceil(count / 12) || 0;
+            document.getElementById('pagesCountText').textContent = `${pages} hoja${pages === 1 ? '' : 's'}`;
+            document.getElementById('statusBadge').innerHTML = `⚽ ${count} jugadores · ⏳ ${pendientes} pendientes · 🖨️ ${impresos} impresos`;
+        }
+
+        // ----------------- FILTROS Y RENDER DE JUGADORES -----------------
+        function setFilter(f) {
+            currentFilter = f;
+            document.getElementById('filterBtnAll').classList.toggle('active', f === 'all');
+            document.getElementById('filterBtnPendientes').classList.toggle('active', f === 'pendientes');
+            document.getElementById('filterBtnImpresos').classList.toggle('active', f === 'impresos');
+            filterPlayers();
+        }
+
+        function filterPlayers() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            let filtered = allPlayers;
+
+            if (currentFilter === 'pendientes') {
+                filtered = filtered.filter(p => !p.impreso);
+            } else if (currentFilter === 'impresos') {
+                filtered = filtered.filter(p => p.impreso);
+            }
+
+            if (q) {
+                filtered = filtered.filter(p => 
+                    p.nombre.toLowerCase().includes(q) || 
+                    p.equipo.toLowerCase().includes(q)
+                );
+            }
+
+            renderPlayers(filtered);
+        }
+
+        function renderPlayers(players) {
+            const grid = document.getElementById('playersGrid');
+            const empty = document.getElementById('emptyState');
+
+            if (!players || players.length === 0) {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            grid.innerHTML = players.map((p) => {
+                const esImpreso = !!p.impreso;
+                const statusClass = esImpreso ? 'impreso' : 'pendiente';
+                const statusText = esImpreso ? '🖨️ Impreso' : '⏳ Pendiente';
+                const cardDisabledClass = !p.equipoHabilitado ? 'disabled-team' : '';
+
+                return `
+                <div class="player-card ${cardDisabledClass}" data-filename="${escapeHtml(p.filename)}">
+                    <button class="delete-btn" onclick="eliminarJugador('${escapeHtml(p.filename)}')" title="Eliminar foto">
+                        ✕
+                    </button>
+                    <div class="player-thumb-wrap" onclick="abrirModalRecorte('${escapeHtml(p.filename)}', '${p.url}')" title="Clic para recortar o centrar el rostro">
+                        <img src="${p.urlCarnet || p.url}" alt="${escapeHtml(p.nombre)}" class="player-thumb" loading="lazy">
+                        <div class="thumb-crop-badge">✂️ Ajustar</div>
+                    </div>
+                    <div class="player-fields">
+                        <div class="field-group">
+                            <label class="field-label">EQUIPO</label>
+                            <input type="text" class="field-input" value="${escapeHtml(p.equipo)}" maxlength="35"
+                                   onchange="actualizarJugador('${escapeHtml(p.filename)}', this.value, null)">
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label">NOMBRE DEL JUGADOR</label>
+                            <input type="text" class="field-input" value="${escapeHtml(p.nombre)}" maxlength="40"
+                                   onchange="actualizarJugador('${escapeHtml(p.filename)}', null, this.value)">
+                        </div>
+
+                        ${!p.equipoHabilitado ? '<span class="team-disabled-badge">🚫 Equipo Inhabilitado para Imprimir</span>' : ''}
+
+                        <div class="player-status-row">
+                            <button type="button" class="impreso-toggle-btn ${statusClass}" onclick="toggleImpresoJugador('${escapeHtml(p.filename)}', ${!esImpreso})" title="Clic para alternar estado de impresión">
+                                ${statusText}
+                            </button>
+                            <button type="button" class="btn-qr-card" onclick="cargarEnCarnetDigital('${escapeHtml(p.filename)}')">
+                                🪪 Carnet & QR
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Alternar impreso individualmente (uno a uno con un solo clic)
+        async function toggleImpresoJugador(filename, nuevoEstado) {
+            try {
+                const res = await fetch('/api/jugador/impreso', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename, impreso: nuevoEstado })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const p = allPlayers.find(item => item.filename === filename);
+                    if (p) p.impreso = nuevoEstado;
+                    updateCounters();
+                    filterPlayers();
+                }
+            } catch (err) {
+                console.error("Error al cambiar estado impreso:", err);
+            }
+        }
+
+        // Marcar a todos masivamente
+        async function marcarTodos(impreso) {
+            const accion = impreso ? 'impresos' : 'pendientes';
+            if (!confirm(`¿Deseas marcar a todos los jugadores como ${accion}?`)) return;
+
+            try {
+                const res = await fetch('/api/jugadores/marcar-todos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ impreso, soloEquiposHabilitados: false })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                }
+            } catch (err) {
+                console.error("Error al marcar todos:", err);
+            }
+        }
+
+        // ----------------- GESTIÓN DE EQUIPOS (CRUD COMPLETO) -----------------
+        let filtroEquiposEstado = 'all'; // 'all', 'habilitados', 'inhabilitados'
+
+        function renderEquipos(equipos) {
+            const list = equipos || [];
+            const inactivos = list.filter(e => !e.habilitado);
+            const inactivosCount = inactivos.length;
+            const habilitadosCount = list.length - inactivosCount;
+
+            // Actualizar botones, badges y banners
+            const badgeTotal = document.getElementById('equiposBadgeTotal');
+            if (badgeTotal) badgeTotal.textContent = `${list.length} equipo${list.length === 1 ? '' : 's'}`;
+
+            const countAll = document.getElementById('countEqAll');
+            if (countAll) countAll.textContent = list.length;
+
+            const countHab = document.getElementById('countEqHabilitados');
+            if (countHab) countHab.textContent = habilitadosCount;
+
+            const countInhab = document.getElementById('countEqInhabilitados');
+            if (countInhab) countInhab.textContent = inactivosCount;
+
+            const btnInactivos = document.getElementById('btnEquiposInactivosCount');
+            if (btnInactivos) btnInactivos.textContent = `${inactivosCount} inactivo${inactivosCount === 1 ? '' : 's'}`;
+
+            const banner = document.getElementById('bannerEquiposInhabilitados');
+            const bannerCount = document.getElementById('bannerEquiposCount');
+            if (banner && bannerCount) {
+                if (inactivosCount > 0) {
+                    banner.style.display = 'flex';
+                    bannerCount.textContent = inactivosCount;
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
+
+            const genHabilitadosText = document.getElementById('genEquiposHabilitadosText');
+            if (genHabilitadosText) {
+                genHabilitadosText.textContent = `${habilitadosCount}/${list.length} habilitados`;
+            }
+
+            // 1. Renderizar la cuadrícula de equipos con filtros actuales
+            filtrarEquiposView();
+
+            // 2. Render Modal Rápido de Equipos
+            renderModalEquipos(list);
+
+            // 3. Render Lista dentro del Modal de Generar
+            renderGenEquiposList(list);
+        }
+
+        function setFiltroEquipos(filtro) {
+            filtroEquiposEstado = filtro;
+            const btnAll = document.getElementById('filterEqAll');
+            const btnHab = document.getElementById('filterEqHabilitados');
+            const btnInhab = document.getElementById('filterEqInhabilitados');
+            if (btnAll) btnAll.classList.toggle('active', filtro === 'all');
+            if (btnHab) btnHab.classList.toggle('active', filtro === 'habilitados');
+            if (btnInhab) btnInhab.classList.toggle('active', filtro === 'inhabilitados');
+            filtrarEquiposView();
+        }
+
+        function filtrarEquiposView() {
+            const grid = document.getElementById('equiposGrid');
+            const empty = document.getElementById('emptyEquiposState');
+            if (!grid) return;
+
+            const qInput = document.getElementById('searchEquiposInput');
+            const query = qInput ? qInput.value.toLowerCase().trim() : '';
+
+            let filtrados = allEquipos || [];
+
+            if (filtroEquiposEstado === 'habilitados') {
+                filtrados = filtrados.filter(e => e.habilitado);
+            } else if (filtroEquiposEstado === 'inhabilitados') {
+                filtrados = filtrados.filter(e => !e.habilitado);
+            }
+
+            if (query) {
+                filtrados = filtrados.filter(e => e.nombre.toLowerCase().includes(query));
+            }
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = '';
+                if (empty) empty.style.display = 'block';
+                return;
+            }
+
+            if (empty) empty.style.display = 'none';
+
+            grid.innerHTML = filtrados.map(e => `
+                <div class="equipo-card ${e.habilitado ? '' : 'disabled'}" style="position: relative;">
+                    <div class="equipo-header">
+                        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                            <span style="font-size: 18px;">🛡️</span>
+                            <div class="equipo-name" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(e.nombre)}">
+                                ${escapeHtml(e.nombre)}
+                            </div>
+                        </div>
+                        <label class="switch" title="Habilitar o inhabilitar este equipo para imprimir" style="flex-shrink: 0;">
+                            <input type="checkbox" ${e.habilitado ? 'checked' : ''} onchange="toggleEquipo('${escapeHtml(e.nombre)}', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="equipo-stats" style="background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; justify-content: space-around;">
+                        <span title="Total de jugadores registrados en este equipo">👥 Total: <b>${e.totalJugadores}</b></span>
+                        <span title="Jugadores ya impresos">🖨️ Impresos: <b>${e.impresos}</b></span>
+                        <span title="Jugadores pendientes de imprimir">⏳ Pendientes: <b>${e.pendientes}</b></span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: -2px;">
+                        <span style="font-size: 11.5px; font-weight: 700; color: ${e.habilitado ? '#059669' : '#dc2626'};">
+                            ${e.habilitado ? '✅ Habilitado para Impresión' : '🚫 Inhabilitado'}
+                        </span>
+                        <span style="font-size: 11px; color: var(--muted);">
+                            ${e.totalJugadores === 0 ? 'Sin jugadores' : `${e.totalJugadores} jugador${e.totalJugadores === 1 ? '' : 'es'}`}
+                        </span>
+                    </div>
+
+                    <div style="display: flex; gap: 6px; margin-top: 4px; padding-top: 10px; border-top: 1px dashed var(--border);">
+                        <button type="button" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center; font-size: 11.5px;" onclick="abrirModalEditarEquipo('${escapeHtml(e.nombre)}', ${e.habilitado})" title="Modificar nombre o estado">
+                            ✏️ Modificar
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" style="justify-content: center; padding: 5px 12px; font-size: 11.5px;" onclick="abrirModalEliminarEquipo('${escapeHtml(e.nombre)}', ${e.totalJugadores})" title="Eliminar equipo">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function abrirModalEquipos() {
+            renderModalEquipos(allEquipos);
+            document.getElementById('modalEquipos').classList.add('active');
+        }
+
+        function cerrarModalEquipos() {
+            document.getElementById('modalEquipos').classList.remove('active');
+        }
+
+        function renderModalEquipos(equipos) {
+            const list = document.getElementById('modalEquiposList');
+            if (!list) return;
+            if (!equipos || equipos.length === 0) {
+                list.innerHTML = '<div class="empty-state">No hay equipos registrados. Pulsa en "➕ Nuevo Equipo" para agregar uno.</div>';
+                return;
+            }
+
+            list.innerHTML = equipos.map(e => `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: ${e.habilitado ? '#f8fafc' : '#fef2f2'}; border: 1px solid ${e.habilitado ? '#e2e8f0' : '#fecaca'}; border-radius: 8px; gap: 10px;">
+                    <div style="min-width: 0; flex: 1;">
+                        <div style="font-size: 14.5px; font-weight: 700; color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${escapeHtml(e.nombre)}
+                        </div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                            ${e.totalJugadores} jugadores (${e.pendientes} pendientes, ${e.impresos} impresos)
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                        <label class="switch" title="Habilitar o inhabilitar este equipo">
+                            <input type="checkbox" ${e.habilitado ? 'checked' : ''} onchange="toggleEquipo('${escapeHtml(e.nombre)}', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cerrarModalEquipos(); abrirModalEditarEquipo('${escapeHtml(e.nombre)}', ${e.habilitado});" title="Modificar equipo" style="padding: 4px 8px; font-size: 11px;">
+                            ✏️
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="cerrarModalEquipos(); abrirModalEliminarEquipo('${escapeHtml(e.nombre)}', ${e.totalJugadores});" title="Eliminar equipo" style="padding: 4px 8px; font-size: 11px;">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderGenEquiposList(equipos) {
+            const container = document.getElementById('genEquiposCheckboxes');
+            if (!container) return;
+            if (!equipos || equipos.length === 0) {
+                container.innerHTML = '<div style="font-size: 12px; color: var(--muted); grid-column: 1/-1;">No hay equipos.</div>';
+                return;
+            }
+
+            container.innerHTML = equipos.map(e => `
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 5px 8px; border-radius: 6px; background: ${e.habilitado ? '#f0fdf4' : '#fef2f2'}; border: 1px solid ${e.habilitado ? '#bbf7d0' : '#fecaca'}; cursor: pointer;">
+                    <input type="checkbox" ${e.habilitado ? 'checked' : ''} onchange="toggleEquipo('${escapeHtml(e.nombre)}', this.checked)">
+                    <span style="font-weight: 700; color: ${e.habilitado ? '#166534' : '#991b1b'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${escapeHtml(e.nombre)} (${e.totalJugadores})
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        async function toggleEquipo(nombre, habilitado) {
+            try {
+                await fetch('/api/equipos/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, habilitado })
+                });
+                await cargarJugadores();
+                await cargarEquipos();
+            } catch (err) {
+                console.error("Error al alternar equipo:", err);
+            }
+        }
+
+        async function toggleTodosEquipos(habilitado) {
+            try {
+                await fetch('/api/equipos/toggle-todos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ habilitado })
+                });
+                await cargarJugadores();
+                await cargarEquipos();
+            } catch (err) {
+                console.error("Error al alternar todos los equipos:", err);
+            }
+        }
+
+        // --- Modales y Acciones CRUD de Equipos ---
+        function abrirModalCrearEquipo() {
+            document.getElementById('modalEquipoFormIcon').textContent = '➕';
+            document.getElementById('modalEquipoFormTitle').textContent = 'Nuevo Equipo';
+            document.getElementById('equipoEditOriginalName').value = '';
+            document.getElementById('equipoInputNombre').value = '';
+            document.getElementById('equipoInputHabilitado').checked = true;
+            document.getElementById('equipoFormRenombrarWarning').style.display = 'none';
+            document.getElementById('btnGuardarEquipo').textContent = '💾 Crear Equipo';
+            document.getElementById('modalEquipoForm').classList.add('active');
+            setTimeout(() => {
+                const inp = document.getElementById('equipoInputNombre');
+                if (inp) inp.focus();
+            }, 100);
+        }
+
+        function abrirModalEditarEquipo(nombre, habilitado) {
+            document.getElementById('modalEquipoFormIcon').textContent = '✏️';
+            document.getElementById('modalEquipoFormTitle').textContent = `Modificar: ${nombre}`;
+            document.getElementById('equipoEditOriginalName').value = nombre;
+            document.getElementById('equipoInputNombre').value = nombre;
+            document.getElementById('equipoInputHabilitado').checked = !!habilitado;
+            document.getElementById('equipoFormRenombrarWarning').style.display = 'block';
+            document.getElementById('btnGuardarEquipo').textContent = '💾 Guardar Cambios';
+            document.getElementById('modalEquipoForm').classList.add('active');
+            setTimeout(() => {
+                const inp = document.getElementById('equipoInputNombre');
+                if (inp) {
+                    inp.focus();
+                    inp.select();
+                }
+            }, 100);
+        }
+
+        function cerrarModalEquipoForm() {
+            document.getElementById('modalEquipoForm').classList.remove('active');
+        }
+
+        async function guardarFormEquipo(event) {
+            event.preventDefault();
+            const originalName = document.getElementById('equipoEditOriginalName').value.trim();
+            const nuevoNombre = document.getElementById('equipoInputNombre').value.trim();
+            const habilitado = document.getElementById('equipoInputHabilitado').checked;
+
+            if (!nuevoNombre) {
+                alert('Por favor ingresa un nombre para el equipo.');
+                return;
+            }
+
+            const btn = document.getElementById('btnGuardarEquipo');
+            btn.disabled = true;
+            btn.textContent = 'Guardando...';
+
+            try {
+                if (!originalName) {
+                    // CREAR EQUIPO NUEVO
+                    const res = await fetch('/api/equipos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nombre: nuevoNombre, habilitado })
+                    });
+                    const data = await res.json();
+                    if (!data.success) {
+                        alert(data.error || 'Error al crear el equipo.');
+                        btn.disabled = false;
+                        btn.textContent = '💾 Crear Equipo';
+                        return;
+                    }
+                } else {
+                    // MODIFICAR EQUIPO EXISTENTE
+                    const res = await fetch(`/api/equipos/${encodeURIComponent(originalName)}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nuevoNombre, habilitado })
+                    });
+                    const data = await res.json();
+                    if (!data.success) {
+                        alert(data.error || 'Error al modificar el equipo.');
+                        btn.disabled = false;
+                        btn.textContent = '💾 Guardar Cambios';
+                        return;
+                    }
+                }
+
+                cerrarModalEquipoForm();
+                await cargarEquipos();
+                await cargarJugadores();
+            } catch (err) {
+                alert('Error de conexión al guardar el equipo: ' + err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function abrirModalEliminarEquipo(nombre, totalJugadores) {
+            document.getElementById('eliminarEquipoNombre').value = nombre;
+            document.getElementById('eliminarEquipoTotalJugadores').value = totalJugadores || 0;
+
+            const body = document.getElementById('modalEliminarEquipoBody');
+            if (totalJugadores > 0) {
+                body.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        ¿Estás seguro de que deseas eliminar el equipo <b>"${escapeHtml(nombre)}"</b>?
+                    </div>
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; color: #991b1b; font-size: 13px;">
+                        ⚠️ <b>Atención:</b> Este equipo tiene <b>${totalJugadores} jugador(es)</b> y fotos asociadas en el sistema.<br>
+                        Al eliminarlo, se borrarán <b>definitivamente</b> los registros y fotos de todos sus jugadores.
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <div>
+                        ¿Estás seguro de que deseas eliminar el equipo <b>"${escapeHtml(nombre)}"</b>?<br>
+                        <span style="color: #059669; font-size: 13px;">Este equipo no tiene jugadores asignados actualmente.</span>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modalEliminarEquipo').classList.add('active');
+        }
+
+        function cerrarModalEliminarEquipo() {
+            document.getElementById('modalEliminarEquipo').classList.remove('active');
+        }
+
+        async function ejecutarEliminarEquipo() {
+            const nombre = document.getElementById('eliminarEquipoNombre').value.trim();
+            if (!nombre) return;
+
+            const btn = document.getElementById('btnConfirmarEliminarEquipo');
+            btn.disabled = true;
+            btn.textContent = 'Eliminando...';
+
+            try {
+                const res = await fetch(`/api/equipos/${encodeURIComponent(nombre)}?eliminarJugadores=true`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    alert(data.error || 'Error al eliminar el equipo.');
+                    btn.disabled = false;
+                    btn.textContent = '🗑️ Eliminar Definitivamente';
+                    return;
+                }
+
+                cerrarModalEliminarEquipo();
+                await cargarEquipos();
+                await cargarJugadores();
+            } catch (err) {
+                alert('Error al eliminar equipo: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🗑️ Eliminar Definitivamente';
+            }
+        }
+
+        // ----------------- MÓDULO CARNET DIGITAL & REGISTRO -----------------
+        function normalizarTexto(texto) {
+            return (texto || '')
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        function onCarnetSearchInput(e) {
+            const val = (e.target.value || '').trim();
+            const drop = document.getElementById('carnetSearchSuggestions');
+            const err = document.getElementById('carnetSearchError');
+            if (err) err.style.display = 'none';
+            e.target.style.borderColor = '#cbd5e1';
+
+            if (val.length < 2) {
+                drop.style.display = 'none';
+                drop.innerHTML = '';
+                return;
+            }
+
+            const valNorm = normalizarTexto(val);
+            const matches = allPlayers.filter(p => {
+                const nom = normalizarTexto(p.nombre);
+                const eq = normalizarTexto(p.equipo);
+                return nom.includes(valNorm) || eq.includes(valNorm);
+            }).slice(0, 8);
+
+            if (matches.length === 0) {
+                drop.style.display = 'none';
+                drop.innerHTML = '';
+                return;
+            }
+
+            drop.innerHTML = matches.map(p => `
+                <div class="autocomplete-item" onclick="seleccionarSugerenciaCarnet('${escapeHtml(p.filename)}')">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 15px;">👤</span>
+                        <span style="font-weight: 700; color: #0f172a; font-size: 13.5px;">${escapeHtml(p.nombre)}</span>
+                    </div>
+                    <span style="font-size: 11.5px; background: #ecfdf5; color: #065f46; font-weight: 700; padding: 2px 8px; border-radius: 12px; border: 1px solid #a7f3d0;">${escapeHtml(p.equipo)}</span>
+                </div>
+            `).join('');
+            drop.style.display = 'block';
+        }
+
+        function seleccionarSugerenciaCarnet(filename) {
+            const p = allPlayers.find(item => item.filename === filename);
+            const drop = document.getElementById('carnetSearchSuggestions');
+            if (drop) drop.style.display = 'none';
+            if (!p) return;
+            document.getElementById('carnetSearchInput').value = p.nombre;
+            mostrarCarnetDigital(p);
+        }
+
+        document.addEventListener('click', (e) => {
+            const drop = document.getElementById('carnetSearchSuggestions');
+            const inp = document.getElementById('carnetSearchInput');
+            if (drop && inp && !drop.contains(e.target) && e.target !== inp) {
+                drop.style.display = 'none';
+            }
+        });
+
+        async function buscarSiguienteCarnet() {
+            const drop = document.getElementById('carnetSearchSuggestions');
+            if (drop) drop.style.display = 'none';
+
+            const input = document.getElementById('carnetSearchInput');
+            const err = document.getElementById('carnetSearchError');
+            const q = input.value.trim();
+
+            if (!q) {
+                if (err) {
+                    err.textContent = '⚠️ Por favor escribe el nombre completo del jugador para continuar.';
+                    err.style.display = 'block';
+                }
+                input.style.borderColor = '#ef4444';
+                input.focus();
+                return;
+            }
+            if (err) err.style.display = 'none';
+            input.style.borderColor = '#cbd5e1';
+
+            const btn = document.getElementById('btnBuscarSiguienteCarnet');
+            const orig = btn ? btn.innerHTML : 'Siguiente ➡️';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Buscando...';
+            }
+
+            try {
+                const res = await fetch(`/api/jugador/buscar?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                
+                const qNorm = normalizarTexto(q);
+                const exacto = (data.resultados || []).find(r => {
+                    const rNorm = normalizarTexto(r.nombre);
+                    if (rNorm === qNorm) return true;
+                    const tokensB = qNorm.split(/\s+/).filter(Boolean);
+                    const tokensJ = rNorm.split(/\s+/).filter(Boolean);
+                    if (tokensB.length >= 2 && tokensB.every(t => tokensJ.includes(t))) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (exacto) {
+                    mostrarCarnetDigital(exacto);
+                } else {
+                    mostrarFormularioRegistro(q);
+                }
+            } catch (err) {
+                console.error("Error buscando jugador:", err);
+                alert("Error de conexión al consultar el jugador: " + err.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = orig;
+                }
+            }
+        }
+
+        function mostrarCarnetDigital(jugador) {
+            currentSelectedPlayer = jugador;
+            document.getElementById('carnetPlaceholder').style.display = 'none';
+            document.getElementById('registerBox').style.display = 'none';
+            document.getElementById('digitalCarnetResult').style.display = 'block';
+
+            document.getElementById('dispName').textContent = jugador.nombre;
+            document.getElementById('dispTeam').textContent = jugador.equipo;
+            document.getElementById('dispPhoto').src = jugador.urlCarnet || jugador.url;
+            document.getElementById('dispQr').src = jugador.qrDataUrl;
+
+            document.getElementById('btnAbrirCarnetWeb').href = jugador.carnetUrl;
+            document.getElementById('btnDescargarQr').href = jugador.qrDataUrl;
+            document.getElementById('btnDescargarQr').download = `QR_${jugador.nombre}.png`;
+
+            const btnImp = document.getElementById('btnToggleImpresoCarnet');
+            btnImp.textContent = jugador.impreso ? '🖨️ Marcado Impreso' : '⏳ Marcar como Impreso';
+            btnImp.className = jugador.impreso ? 'btn btn-primary' : 'btn btn-secondary';
+
+            detenerCamara();
+        }
+
+        function cargarEnCarnetDigital(filename) {
+            const p = allPlayers.find(item => item.filename === filename);
+            if (!p) return;
+
+            setTab('carnet');
+            document.getElementById('carnetSearchInput').value = p.nombre;
+            buscarSiguienteCarnet();
+        }
+
+        async function toggleImpresoDesdeCarnet() {
+            if (!currentSelectedPlayer) return;
+            const nuevoEstado = !currentSelectedPlayer.impreso;
+            await toggleImpresoJugador(currentSelectedPlayer.filename, nuevoEstado);
+            currentSelectedPlayer.impreso = nuevoEstado;
+            const btnImp = document.getElementById('btnToggleImpresoCarnet');
+            btnImp.textContent = nuevoEstado ? '🖨️ Marcado Impreso' : '⏳ Marcar como Impreso';
+            btnImp.className = nuevoEstado ? 'btn btn-primary' : 'btn btn-secondary';
+        }
+
+        function mostrarFormularioRegistro(nombreQuery) {
+            document.getElementById('carnetPlaceholder').style.display = 'none';
+            document.getElementById('digitalCarnetResult').style.display = 'none';
+            document.getElementById('registerBox').style.display = 'flex';
+
+            document.getElementById('regNombre').value = nombreQuery;
+            document.getElementById('regEquipo').value = '';
+            capturedPhotoBase64 = null;
+
+            detenerCamara();
+            document.getElementById('btnModoCamara').className = 'btn btn-secondary btn-sm';
+            document.getElementById('btnModoArchivo').className = 'btn btn-secondary btn-sm';
+            document.getElementById('seccionSinSeleccion').style.display = 'block';
+            document.getElementById('seccionCamara').style.display = 'none';
+            document.getElementById('seccionArchivo').style.display = 'none';
+            document.getElementById('filePreviewBox').style.display = 'none';
+        }
+
+        // Cámara Web
+        function setModoFoto(modo) {
+            document.getElementById('seccionSinSeleccion').style.display = 'none';
+            document.getElementById('btnModoCamara').className = modo === 'camara' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+            document.getElementById('btnModoArchivo').className = modo === 'archivo' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+            document.getElementById('seccionCamara').style.display = modo === 'camara' ? 'block' : 'none';
+            document.getElementById('seccionArchivo').style.display = modo === 'archivo' ? 'block' : 'none';
+
+            if (modo === 'camara') {
+                iniciarCamara();
+            } else {
+                detenerCamara();
+            }
+        }
+
+        async function iniciarCamara() {
+            try {
+                detenerCamara();
+                const video = document.getElementById('camVideo');
+                const canvas = document.getElementById('camCanvas');
+                video.style.display = 'block';
+                canvas.style.display = 'none';
+                document.getElementById('btnCapturarFoto').style.display = 'inline-flex';
+                document.getElementById('btnReintentarCamara').style.display = 'none';
+
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 720 }, height: { ideal: 960 }, facingMode: 'user' }
+                });
+                video.srcObject = mediaStream;
+            } catch (err) {
+                console.warn("No se pudo iniciar cámara:", err);
+                document.getElementById('cameraBox').innerHTML = `
+                    <div style="color: white; font-size: 13px; text-align: center; padding: 20px;">
+                        ⚠️ Cámara no disponible.<br>Por favor usa la opción de "Cargar Archivo".
+                    </div>
+                `;
+            }
+        }
+
+        function detenerCamara() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+        }
+
+        function capturarFotoCamara() {
+            const video = document.getElementById('camVideo');
+            const canvas = document.getElementById('camCanvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            capturedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.95);
+
+            video.style.display = 'none';
+            canvas.style.display = 'block';
+            document.getElementById('btnCapturarFoto').style.display = 'none';
+            document.getElementById('btnReintentarCamara').style.display = 'inline-flex';
+            detenerCamara();
+        }
+
+        function previewArchivoFoto(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                capturedPhotoBase64 = evt.target.result;
+                document.getElementById('filePreviewImg').src = capturedPhotoBase64;
+                document.getElementById('filePreviewBox').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function mostrarLoadingModal(title, subtitle) {
+            const m = document.getElementById('loadingModal');
+            if (title) document.getElementById('loadingModalTitle').textContent = title;
+            if (subtitle) document.getElementById('loadingModalSubtitle').textContent = subtitle;
+            if (m) m.classList.add('active');
+        }
+
+        function ocultarLoadingModal() {
+            const m = document.getElementById('loadingModal');
+            if (m) m.classList.remove('active');
+        }
+
+        async function guardarRegistroRapido() {
+            const nombreInput = document.getElementById('regNombre');
+            const equipoInput = document.getElementById('regEquipo');
+            const errNombre = document.getElementById('regNombreError');
+            const errEquipo = document.getElementById('regEquipoError');
+            const errFoto = document.getElementById('regFotoError');
+
+            if (errNombre) errNombre.style.display = 'none';
+            if (errEquipo) errEquipo.style.display = 'none';
+            if (errFoto) errFoto.style.display = 'none';
+            nombreInput.style.borderColor = '#cbd5e1';
+            equipoInput.style.borderColor = '#cbd5e1';
+
+            const nombre = nombreInput.value.trim();
+            const equipo = equipoInput.value.trim();
+
+            let hasError = false;
+            if (!nombre) {
+                if (errNombre) errNombre.style.display = 'block';
+                nombreInput.style.borderColor = '#ef4444';
+                nombreInput.focus();
+                hasError = true;
+            }
+            if (!equipo) {
+                if (errEquipo) errEquipo.style.display = 'block';
+                equipoInput.style.borderColor = '#ef4444';
+                if (!hasError) equipoInput.focus();
+                hasError = true;
+            }
+            if (!capturedPhotoBase64) {
+                if (errFoto) errFoto.style.display = 'block';
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            const btn = document.getElementById('btnGuardarRegistro');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Guardando en MySQL...';
+
+            mostrarLoadingModal('💾 Guardando Registro...', 'Guardando información del jugador y su foto en la base de datos MySQL, y generando código QR...');
+
+            try {
+                const res = await fetch('/api/jugador/registrar-rapido', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nombre,
+                        equipo,
+                        fotoBase64: capturedPhotoBase64,
+                        admin: true
+                    })
+                });
+                const data = await res.json();
+                if (data.success && data.jugador) {
+                    await cargarJugadores();
+                    await cargarEquipos();
+                    mostrarCarnetDigital(data.jugador);
+                } else {
+                    alert("Error: " + (data.error || 'No se pudo registrar'));
+                }
+            } catch (err) {
+                alert("Error al guardar: " + err.message);
+            } finally {
+                ocultarLoadingModal();
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // ----------------- MODAL DE GENERACIÓN DE CARNETS -----------------
+        function abrirModalGenerar() {
+            const pendientes = allPlayers.filter(p => !p.impreso && p.equipoHabilitado).length;
+            const habilitados = allPlayers.filter(p => p.equipoHabilitado).length;
+
+            document.getElementById('modalCountPendientes').textContent = `${pendientes} jugador${pendientes === 1 ? '' : 'es'}`;
+            document.getElementById('modalCountHabilitados').textContent = `${habilitados} jugador${habilitados === 1 ? '' : 'es'}`;
+
+            renderGenEquiposList(allEquipos);
+            document.getElementById('generateModal').classList.add('active');
+        }
+
+        function cerrarModalGenerar() {
+            document.getElementById('generateModal').classList.remove('active');
+        }
+
+        async function ejecutarGeneracion() {
+            const mode = document.querySelector('input[name="genMode"]:checked').value;
+            const autoMarcar = document.getElementById('modalAutoMarcar').checked;
+            const soloPendientes = (mode === 'pendientes');
+
+            cerrarModalGenerar();
+            mostrarLoadingModal('⚙️ Generando Planillas Word & PDF...', 'Componiendo documento Word oficial y exportando a PDF horizontal con Word COM. Por favor espera unos momentos...');
+
+            const btn = document.getElementById('btnGenerar');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="spinner"></span> Generando...`;
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/generar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        soloPendientes,
+                        autoMarcarImpresos: autoMarcar
+                    })
+                });
+                const rawText = await res.text();
+                let data = null;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseErr) {
+                    const checkDocx = await fetch('/api/descargar/docx', { method: 'HEAD' });
+                    if (checkDocx.ok) {
+                        data = {
+                            success: true,
+                            totalJugadores: 'los',
+                            totalPaginas: 'las',
+                            marcadosComoImpresos: autoMarcar
+                        };
+                    } else {
+                        throw new Error('El servidor tardó en responder. Por favor reintenta.');
+                    }
+                }
+
+                if (data.success) {
+                    document.getElementById('modalDesc').textContent = 
+                        `Se generaron exitosamente ${data.totalJugadores || ''} carnets en ${data.totalPaginas || ''} página(s) horizontales. Los archivos Word y PDF están listos.` +
+                        (data.marcadosComoImpresos ? ` Se actualizaron los registros como impresos automáticamente.` : '');
+                    document.getElementById('resultModal').classList.add('active');
+                    await cargarJugadores();
+                    await cargarEquipos();
+                } else {
+                    alert("Aviso: " + (data.message || data.error));
+                }
+            } catch (err) {
+                console.error("Error al generar:", err);
+                alert("Hubo un error al generar los documentos: " + err.message);
+            } finally {
+                ocultarLoadingModal();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function abrirArchivo(tipo) {
+            fetch('/api/abrir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo })
+            });
+        }
+
+        function abrirCarpetaFotos() {
+            fetch('/api/abrir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: 'fotos' })
+            });
+        }
+
+        function abrirCarpetaSalida() {
+            fetch('/api/abrir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: 'salida' })
+            });
+        }
+
+        function cerrarModal() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        // Actualizar jugador en vivo
+        async function actualizarJugador(filename, nuevoEquipo, nuevoNombre) {
+            const player = allPlayers.find(p => p.filename === filename);
+            if (!player) return;
+
+            const eq = nuevoEquipo !== null ? nuevoEquipo : player.equipo;
+            const nom = nuevoNombre !== null ? nuevoNombre : player.nombre;
+
+            try {
+                const res = await fetch('/api/actualizar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        oldFilename: filename,
+                        nuevoEquipo: eq,
+                        nuevoNombre: nom
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                    await cargarEquipos();
+                }
+            } catch (err) {
+                console.error("Error al actualizar:", err);
+            }
+        }
+
+        async function eliminarJugador(filename) {
+            if (!confirm(`¿Eliminar la foto de este jugador?`)) return;
+            try {
+                await fetch(`/api/jugador/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+                await cargarJugadores();
+                await cargarEquipos();
+            } catch (err) {
+                console.error("Error al eliminar:", err);
+            }
+        }
+
+        async function limpiarTodo() {
+            if (!confirm('¿Estás seguro de que deseas vaciar todas las fotos para empezar un nuevo grupo?')) return;
+            try {
+                await fetch('/api/limpiar', { method: 'POST' });
+                await cargarJugadores();
+                await cargarEquipos();
+            } catch (err) {
+                console.error("Error al limpiar:", err);
+            }
+        }
+
+        // Subida masiva de fotos
+        function setupDropzone() {
+            const dropzone = document.getElementById('dropzone');
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length > 0) uploadFiles(files);
+            });
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) uploadFiles(files);
+        }
+
+        async function uploadFiles(files) {
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('fotos', files[i]);
+            }
+
+            const dropzone = document.getElementById('dropzone');
+            const originalHTML = dropzone.innerHTML;
+            dropzone.innerHTML = `
+                <div class="dropzone-icon"><span class="spinner"></span></div>
+                <h3>Subiendo ${files.length} fotos a MySQL y archivos...</h3>
+                <p>Detectando rostros, equipos y normalizando nombres...</p>
+            `;
+
+            try {
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    await cargarJugadores();
+                    await cargarEquipos();
+                }
+            } catch (err) {
+                console.error("Error al subir:", err);
+                alert("Hubo un error al subir las fotos.");
+            } finally {
+                dropzone.innerHTML = originalHTML;
+            }
+        }
+
+        // Vista previa de hojas
+        function renderSheetPreview() {
+            const container = document.getElementById('sheetPages');
+            const habilitados = allPlayers.filter(p => p.equipoHabilitado);
+
+            if (habilitados.length === 0) {
+                container.innerHTML = '<div class="empty-state">No hay jugadores de equipos habilitados para mostrar vista previa.</div>';
+                return;
+            }
+
+            const CARDS_PER_PAGE = 12;
+            const totalPages = Math.ceil(habilitados.length / CARDS_PER_PAGE);
+            let html = '';
+
+            for (let p = 0; p < totalPages; p++) {
+                const pagePlayers = habilitados.slice(p * CARDS_PER_PAGE, (p + 1) * CARDS_PER_PAGE);
+                
+                let tableHtml = '<table class="carnets-table"><tbody>';
+                for (let r = 0; r < 4; r++) {
+                    tableHtml += '<tr>';
+                    for (let c = 0; c < 3; c++) {
+                        const idx = r * 3 + c;
+                        const player = pagePlayers[idx];
+
+                        if (!player) {
+                            tableHtml += '<td></td>';
+                        } else {
+                            tableHtml += `
+                                <td>
+                                    <div class="carnet-box">
+                                        <img src="/banner.png" alt="Torneo San Antonio" class="carnet-banner-img">
+                                        <div class="carnet-body-row">
+                                            <img src="${player.urlCarnet || player.url}" class="carnet-player-photo" alt="${escapeHtml(player.nombre)}">
+                                            <div class="carnet-info-box">
+                                                <div class="team-text">
+                                                    <span class="title-bold">EQUIPO:</span> ${escapeHtml(player.equipo)}
+                                                </div>
+                                                <div class="name-label">
+                                                    <span class="title-bold">NOMBRE:</span>
+                                                </div>
+                                                <div class="player-name-text">
+                                                    ${escapeHtml(player.nombre)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            `;
+                        }
+                    }
+                    tableHtml += '</tr>';
+                }
+                tableHtml += '</tbody></table>';
+
+                html += `
+                    <div style="width: 100%; max-width: 1120px; margin-bottom: 24px;">
+                        <div class="sheet-header-info">
+                            <span>📄 HOJA ${p + 1} DE ${totalPages} (Formato Carta Horizontal - 12 Carnets)</span>
+                            <span>${pagePlayers.length} Carnets en esta hoja</span>
+                        </div>
+                        <div class="sheet-page">
+                            ${tableHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ================= CROPPER MODAL INTERACTIVO =================
+        let cropState = {
+            filename: null,
+            img: null,
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            initCropX: 0,
+            initCropY: 0,
+            initCropW: 0,
+            initCropH: 0,
+            mode: 'move'
+        };
+
+        function abrirModalRecorte(filename, rawUrl) {
+            cropState.filename = filename;
+            const p = allPlayers.find(item => item.filename === filename);
+            const title = p ? `Ajustar Foto: ${p.nombre}` : 'Ajustar y Centrar Foto';
+            document.getElementById('cropModalTitle').textContent = title;
+            
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                cropState.img = img;
+                const canvas = document.getElementById('cropCanvas');
+                const container = document.getElementById('cropContainer');
+                const maxW = container.clientWidth || 550;
+                const maxH = container.clientHeight || 380;
+                
+                let displayW = img.width;
+                let displayH = img.height;
+                const scale = Math.min(maxW / displayW, maxH / displayH, 1);
+                displayW = Math.round(displayW * scale);
+                displayH = Math.round(displayH * scale);
+                
+                canvas.width = displayW;
+                canvas.height = displayH;
+                
+                const targetRatio = 800 / 880;
+                let boxH = Math.round(displayH * 0.75);
+                let boxW = Math.round(boxH * targetRatio);
+                if (boxW > displayW) {
+                    boxW = Math.round(displayW * 0.85);
+                    boxH = Math.round(boxW / targetRatio);
+                }
+                
+                cropState.width = boxW;
+                cropState.height = boxH;
+                cropState.x = Math.round((displayW - boxW) / 2);
+                cropState.y = Math.round((displayH - boxH) / 2);
+                
+                dibujarCropper();
+                document.getElementById('cropModal').classList.add('active');
+            };
+            img.src = `${rawUrl}${rawUrl.includes('?') ? '&' : '?'}v=${Date.now()}`;
+        }
+
+        function cerrarModalRecorte() {
+            document.getElementById('cropModal').classList.remove('active');
+            cropState.img = null;
+            cropState.isDragging = false;
+        }
+
+        function dibujarCropper() {
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+            const img = cropState.img;
+            if (!img) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+            ctx.fillRect(0, 0, canvas.width, cropState.y);
+            ctx.fillRect(0, cropState.y + cropState.height, canvas.width, canvas.height - (cropState.y + cropState.height));
+            ctx.fillRect(0, cropState.y, cropState.x, cropState.height);
+            ctx.fillRect(cropState.x + cropState.width, cropState.y, canvas.width - (cropState.x + cropState.width), cropState.height);
+            
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(cropState.x, cropState.y, cropState.width, cropState.height);
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cropState.x + cropState.width / 3, cropState.y);
+            ctx.lineTo(cropState.x + cropState.width / 3, cropState.y + cropState.height);
+            ctx.moveTo(cropState.x + (cropState.width * 2) / 3, cropState.y);
+            ctx.lineTo(cropState.x + (cropState.width * 2) / 3, cropState.y + cropState.height);
+            ctx.moveTo(cropState.x, cropState.y + cropState.height / 3);
+            ctx.lineTo(cropState.x + cropState.width, cropState.y + cropState.height / 3);
+            ctx.moveTo(cropState.x, cropState.y + (cropState.height * 2) / 3);
+            ctx.lineTo(cropState.x + cropState.width, cropState.y + (cropState.height * 2) / 3);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(cropState.x + cropState.width - 12, cropState.y + cropState.height - 12, 12, 12);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(cropState.x + cropState.width - 12, cropState.y + cropState.height - 12, 12, 12);
+        }
+
+        function getCropCanvasPos(e) {
+            const canvas = document.getElementById('cropCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function setupCropListeners() {
+            const canvas = document.getElementById('cropCanvas');
+            if (!canvas) return;
+            
+            const onStart = (e) => {
+                if (!cropState.img) return;
+                const pos = getCropCanvasPos(e);
+                if (pos.x >= cropState.x + cropState.width - 20 && pos.x <= cropState.x + cropState.width + 10 &&
+                    pos.y >= cropState.y + cropState.height - 20 && pos.y <= cropState.y + cropState.height + 10) {
+                    cropState.mode = 'resize';
+                } else if (pos.x >= cropState.x && pos.x <= cropState.x + cropState.width &&
+                           pos.y >= cropState.y && pos.y <= cropState.y + cropState.height) {
+                    cropState.mode = 'move';
+                } else {
+                    return;
+                }
+                cropState.isDragging = true;
+                cropState.dragStartX = pos.x;
+                cropState.dragStartY = pos.y;
+                cropState.initCropX = cropState.x;
+                cropState.initCropY = cropState.y;
+                cropState.initCropW = cropState.width;
+                cropState.initCropH = cropState.height;
+                if (e.cancelable) e.preventDefault();
+            };
+
+            const onMove = (e) => {
+                if (!cropState.isDragging) return;
+                const pos = getCropCanvasPos(e);
+                const dx = pos.x - cropState.dragStartX;
+                const dy = pos.y - cropState.dragStartY;
+                
+                if (cropState.mode === 'move') {
+                    cropState.x = Math.max(0, Math.min(canvas.width - cropState.width, cropState.initCropX + dx));
+                    cropState.y = Math.max(0, Math.min(canvas.height - cropState.height, cropState.initCropY + dy));
+                } else if (cropState.mode === 'resize') {
+                    const targetRatio = 800 / 880;
+                    let newW = Math.max(40, cropState.initCropW + dx);
+                    let newH = Math.round(newW / targetRatio);
+                    if (cropState.x + newW <= canvas.width && cropState.y + newH <= canvas.height) {
+                        cropState.width = newW;
+                        cropState.height = newH;
+                    }
+                }
+                dibujarCropper();
+                if (e.cancelable) e.preventDefault();
+            };
+
+            const onEnd = () => {
+                cropState.isDragging = false;
+            };
+
+            canvas.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            canvas.addEventListener('touchstart', onStart, { passive: false });
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('touchend', onEnd);
+            
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                zoomCrop(e.deltaY > 0 ? 0.08 : -0.08);
+            }, { passive: false });
+        }
+
+        function zoomCrop(factor) {
+            const targetRatio = 800 / 880;
+            const dW = Math.round(cropState.width * factor);
+            const dH = Math.round(dW / targetRatio);
+            const newW = cropState.width + dW;
+            const newH = cropState.height + dH;
+            const canvas = document.getElementById('cropCanvas');
+            if (newW > 40 && newH > 40 && cropState.x + newW <= canvas.width && cropState.y + newH <= canvas.height) {
+                cropState.width = newW;
+                cropState.height = newH;
+                dibujarCropper();
+            }
+        }
+
+        function autoCentrarCrop() {
+            const canvas = document.getElementById('cropCanvas');
+            cropState.x = Math.round((canvas.width - cropState.width) / 2);
+            cropState.y = Math.round((canvas.height - cropState.height) / 2);
+            dibujarCropper();
+        }
+
+        async function guardarRecorte() {
+            const btn = document.getElementById('btnGuardarRecorte');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Guardando...';
+            
+            try {
+                const canvas = document.getElementById('cropCanvas');
+                const scaleX = cropState.img.naturalWidth / canvas.width;
+                const scaleY = cropState.img.naturalHeight / canvas.height;
+                
+                const crop = {
+                    left: Math.round(cropState.x * scaleX),
+                    top: Math.round(cropState.y * scaleY),
+                    width: Math.round(cropState.width * scaleX),
+                    height: Math.round(cropState.height * scaleY)
+                };
+                
+                const res = await fetch('/api/recortar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: cropState.filename,
+                        crop
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    cerrarModalRecorte();
+                    await cargarJugadores();
+                    if (currentTab === 'preview') {
+                        renderSheetPreview();
+                    }
+                } else {
+                    alert('Error al guardar el recorte: ' + (data.error || 'Desconocido'));
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>

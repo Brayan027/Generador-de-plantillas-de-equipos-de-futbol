@@ -1,9 +1,18 @@
 {
+  "name": "sistema-carnets-san-antonio",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión, Consulta y Descarga de Carnets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "docx": "^9.7.2",
     "express": "^5.2.1",
     "jszip": "^3.10.2",
     "multer": "^2.4.0",
+    "mysql2": "^3.24.5",
+    "qrcode": "^1.5.4",
     "sharp": "^0.35.5"
   }
 }

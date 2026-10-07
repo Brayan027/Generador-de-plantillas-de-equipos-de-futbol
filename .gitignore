@@ -14,3 +14,7 @@ Thumbs.db
 # Fotos de jugadores (mantener solo en local)
 fotos_jugadores/*
 !fotos_jugadores/.gitkeep
+
+# Variables de entorno y credenciales
+.env
+askpass.bat

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnet Digital Oficial - Torneo San Antonio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --dark: #0f172a;
+            --slate: #334155;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #0b1120;
+            --card-bg: #ffffff;
+            --radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .verified-banner {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Carnet Card */
+        .carnet-card {
+            width: 100%;
+            background: #ffffff;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .carnet-header {
+            width: 100%;
+            background: #ffffff;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .carnet-header img {
+            width: 100%;
+            max-height: 90px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .carnet-body {
+            padding: 24px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .photo-wrapper {
+            width: 140px;
+            height: 165px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid #10b981;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+            background: #f1f5f9;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+            display: block;
+        }
+
+        .info-pill {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+        }
+
+        .player-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(18px, 5.5vw, 24px);
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.18;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            word-break: break-word;
+            max-width: 100%;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .team-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 10px 16px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .team-box .label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #166534;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .team-box .team-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #14532d;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-note {
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .loader {
+            color: white;
+            font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <div>Cargando carnet digital oficial...</div>
+        </div>
+
+        <div id="content" style="display: none; width: 100%;">
+            <div style="display: flex; justify-content: center; margin-bottom: 12px;">
+                <div class="verified-banner" id="verifiedBanner">
+                    <span class="pulse-dot" id="pulseDot"></span>
+                    <span id="bannerText">CARNET OFICIAL VALIDADO POR EL SISTEMA</span>
+                </div>
+            </div>
+
+            <div class="carnet-card">
+                <div class="carnet-header">
+                    <img src="/banner.png" alt="Torneo San Antonio">
+                </div>
+
+                <div class="carnet-body">
+                    <div class="photo-wrapper">
+                        <img id="cardPhoto" src="" alt="Foto Jugador">
+                    </div>
+
+                    <div class="info-pill" id="cardPill">Jugador Oficial</div>
+                    <h2 class="player-name" id="cardName">Cargando...</h2>
+
+                    <div class="team-box">
+                        <div class="label">Equipo</div>
+                        <div class="team-name" id="cardTeam">Cargando...</div>
+                    </div>
+
+                    <div class="status-badge" id="statusBadge">
+                        <span>✅</span> HABILITADO PARA EL TORNEO
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
+                <button id="btnDescargar" onclick="descargarCarnetActual()" style="background: #10b981; color: white; border: none; padding: 14px 20px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(16,185,129,0.35);">
+                    📥 Descargar Carnet (Imagen)
+                </button>
+                <a href="/" style="background: rgba(255,255,255,0.1); color: #cbd5e1; text-decoration: none; padding: 11px 20px; border-radius: 10px; font-weight: 600; font-size: 13.5px; text-align: center; border: 1px solid rgba(255,255,255,0.15);">
+                    🔍 Ir a Consulta y Registro
+                </a>
+            </div>
+
+            <div class="footer-note" style="margin-top: 14px;">
+                Torneo de Fútbol San Antonio · Sistema Oficial de Carnets
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentJugador = null;
+
+        async function loadCarnet() {
+            const token = window.location.pathname.split('/').pop();
+            if (!token) {
+                document.getElementById('loader').innerHTML = '❌ Token de carnet no válido.';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/carnet-data/${token}`);
+                const data = await res.json();
+
+                if (!data.success || !data.jugador) {
+                    document.getElementById('loader').innerHTML = `
+                        <div style="text-align: center; color: #ef4444;">
+                            <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+                            <h3>Carnet no encontrado</h3>
+                            <p style="font-size: 13px; color: #cbd5e1; margin-top: 6px;">Este jugador no está registrado o el enlace ha caducado.</p>
+                            <a href="/" style="display: inline-block; margin-top: 14px; color: white; background: #10b981; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px;">Ir a Consulta y Registro</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const j = data.jugador;
+                currentJugador = j;
+                document.getElementById('cardName').textContent = j.nombre;
+                document.getElementById('cardTeam').textContent = j.equipo;
+                document.getElementById('cardPhoto').src = j.urlCarnet || j.url;
+
+                const esAprobado = j.aprobado !== false;
+                const banner = document.getElementById('verifiedBanner');
+                const dot = document.getElementById('pulseDot');
+                const bannerText = document.getElementById('bannerText');
+                const pill = document.getElementById('cardPill');
+                const statusBadge = document.getElementById('statusBadge');
+
+                if (esAprobado) {
+                    banner.style.background = 'rgba(16, 185, 129, 0.15)';
+                    banner.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                    banner.style.color = '#34d399';
+                    dot.style.background = '#10b981';
+                    dot.style.boxShadow = '0 0 10px #10b981';
+                    bannerText.textContent = 'CARNET OFICIAL VALIDADO POR EL SISTEMA';
+                    pill.textContent = 'Jugador Oficial';
+                    statusBadge.style.background = '#f0fdf4';
+                    statusBadge.style.color = '#166534';
+                    statusBadge.innerHTML = '<span>✅</span> HABILITADO PARA EL TORNEO';
+                } else {
+                    banner.style.background = 'rgba(245, 158, 11, 0.15)';
+                    banner.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+                    banner.style.color = '#fbbf24';
+                    dot.style.background = '#f59e0b';
+                    dot.style.boxShadow = '0 0 10px #f59e0b';
+                    bannerText.textContent = 'SOLICITUD EN REVISIÓN / POR APROBAR';
+                    pill.textContent = 'En Revisión';
+                    statusBadge.style.background = '#fef3c7';
+                    statusBadge.style.color = '#92400e';
+                    statusBadge.innerHTML = '<span>⏳</span> PENDIENTE DE APROBACIÓN POR LA ORGANIZACIÓN';
+                }
+
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                document.title = `${j.nombre} - ${j.equipo} | Carnet ${esAprobado ? 'Oficial' : 'En Revisión'}`;
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loader').innerHTML = '❌ Error al conectar con el servidor.';
+            }
+        }
+
+        async function descargarCarnetActual() {
+            if (!currentJugador) return;
+            const btn = document.getElementById('btnDescargar');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Generando imagen...';
+
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 640;
+                canvas.height = 840;
+                const ctx = canvas.getContext('2d');
+
+                // Fondo blanco
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, 640, 840);
+
+                // Marco exterior
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(3, 3, 634, 834);
+
+                // Cargar banner
+                const bannerImg = new Image();
+                bannerImg.crossOrigin = 'anonymous';
+                bannerImg.src = '/banner.png';
+                await new Promise((resolve) => {
+                    bannerImg.onload = resolve;
+                    bannerImg.onerror = resolve;
+                });
+
+                if (bannerImg.width) {
+                    ctx.drawImage(bannerImg, 20, 16, 600, 115);
+                }
+
+                // Línea divisoria
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(20, 142);
+                ctx.lineTo(620, 142);
+                ctx.stroke();
+
+                // Cargar foto
+                const photoImg = new Image();
+                photoImg.crossOrigin = 'anonymous';
+                photoImg.src = currentJugador.urlCarnet || currentJugador.url;
+                await new Promise((resolve) => {
+                    photoImg.onload = resolve;
+                    photoImg.onerror = resolve;
+                });
+
+                const pW = 270;
+                const pH = 320;
+                const pX = (640 - pW) / 2;
+                const pY = 170;
+
+                // Sombra foto
+                ctx.save();
+                ctx.fillStyle = '#f1f5f9';
+                ctx.shadowColor = 'rgba(16, 185, 129, 0.35)';
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 6;
+                if (ctx.roundRect) ctx.roundRect(pX, pY, pW, pH, 16);
+                else ctx.rect(pX, pY, pW, pH);
+                ctx.fill();
+                ctx.restore();
+
+                // Foto recortada
+                ctx.save();
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(pX, pY, pW, pH, 16);
+                else ctx.rect(pX, pY, pW, pH);
+                ctx.clip();
+                if (photoImg.width) {
+                    ctx.drawImage(photoImg, pX, pY, pW, pH);
+                }
+                ctx.restore();
+
+                // Borde foto
+                ctx.save();
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(pX, pY, pW, pH, 16);
+                else ctx.rect(pX, pY, pW, pH);
+                ctx.stroke();
+                ctx.restore();
+
+                // Nombre Jugador
+                ctx.fillStyle = '#0f172a';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const nombreStr = (currentJugador.nombre || '').toUpperCase();
+                ctx.font = nombreStr.length > 24 ? 'bold 26px "Outfit", Arial, sans-serif' : 'bold 32px "Outfit", Arial, sans-serif';
+                ctx.fillText(nombreStr, 320, 545);
+
+                // Equipo
+                const eqStr = (currentJugador.equipo || '').toUpperCase();
+                ctx.font = 'bold 20px "Plus Jakarta Sans", Arial, sans-serif';
+                const eqW = ctx.measureText(eqStr).width + 48;
+                const eqX = (640 - eqW) / 2;
+                const eqY = 585;
+                const eqH = 42;
+
+                ctx.fillStyle = '#ecfdf5';
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(eqX, eqY, eqW, eqH, 21);
+                else ctx.rect(eqX, eqY, eqW, eqH);
+                ctx.fill();
+
+                ctx.strokeStyle = '#a7f3d0';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#065f46';
+                ctx.fillText(eqStr, 320, eqY + eqH / 2);
+
+                // Badge Estado
+                const stY = 655;
+                ctx.fillStyle = '#f8fafc';
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(80, stY, 480, 48, 12);
+                else ctx.rect(80, stY, 480, 48);
+                ctx.fill();
+
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.fillStyle = '#059669';
+                ctx.font = 'bold 17px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.fillText('🛡️ HABILITADO PARA EL TORNEO OFICIAL', 320, stY + 24);
+
+                // Pie de página
+                ctx.fillStyle = '#64748b';
+                ctx.font = '600 13px "Plus Jakarta Sans", Arial, sans-serif';
+                ctx.fillText('TORNEO DE FÚTBOL SAN ANTONIO · CARNET DIGITAL', 320, 755);
+
+                // Descargar
+                const safeName = (currentJugador.nombre || 'Jugador').replace(/[^a-zA-Z0-9_\-]/g, '_');
+                const link = document.createElement('a');
+                link.download = `Carnet_${safeName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                console.warn('Canvas error, fallback to server:', err);
+                const token = currentJugador.qrToken || currentJugador.id;
+                if (token) {
+                    window.location.href = `/api/carnet/descargar-imagen/${token}`;
+                } else {
+                    alert('No se pudo procesar la descarga de imagen.');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadCarnet);
+    </script>
+</body>
+</html>
