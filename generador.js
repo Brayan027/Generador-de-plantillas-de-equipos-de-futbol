@@ -264,50 +264,6 @@ async function generarCarnets(opciones = {}) {
     if (!tblMatch) throw new Error('No se encontró la tabla de carnets en la plantilla original');
     const originalTblXml = tblMatch[0];
 
-    // Asegurar que [Content_Types].xml soporte jpeg y png
-    let contentTypesXml = await zip.file('[Content_Types].xml').async('text');
-    if (!contentTypesXml.includes('Extension="jpeg"') || !contentTypesXml.includes('Extension="jpg"')) {
-        contentTypesXml = contentTypesXml.replace('</Types>', '<Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="jpg" ContentType="image/jpeg"/></Types>');
-        zip.file('[Content_Types].xml', contentTypesXml);
-    }
-
-    // Pre-procesar todas las fotos en paralelo para máxima velocidad (de 35s a 2s)
-    console.log(`Optimizando y procesando fotos de ${players.length} jugadores en paralelo...`);
-    const processedPhotosMap = new Map();
-    const BATCH_SIZE = 8;
-    for (let i = 0; i < players.length; i += BATCH_SIZE) {
-        const batch = players.slice(i, i + BATCH_SIZE);
-        await Promise.all(batch.map(async (player) => {
-            const key = player.filename || player.filePath;
-            let rawPhoto = player.buffer;
-            if (!rawPhoto && player.filePath && fs.existsSync(player.filePath)) {
-                try { rawPhoto = fs.readFileSync(player.filePath); } catch (_) {}
-            }
-            if (!rawPhoto) return;
-
-            try {
-                // Rotar según orientación EXIF y redimensionar inteligentemente
-                let resized = await sharp(rawPhoto)
-                    .rotate()
-                    .resize(600, 660, { fit: 'cover', position: sharp.strategy.attention, kernel: 'lanczos3' })
-                    .jpeg({ quality: 86, mozjpeg: false })
-                    .toBuffer();
-                processedPhotosMap.set(key, resized);
-            } catch (err) {
-                try {
-                    let resized = await sharp(rawPhoto)
-                        .rotate()
-                        .resize(600, 660, { fit: 'cover', position: 'center' })
-                        .jpeg({ quality: 86 })
-                        .toBuffer();
-                    processedPhotosMap.set(key, resized);
-                } catch (e2) {
-                    console.warn(`Aviso al procesar foto de ${player.nombre}:`, e2.message);
-                }
-            }
-        }));
-    }
-
     // Dividir en páginas de 12 carnets (cuadrícula 3x4)
     const CARDS_PER_PAGE = 12;
     const pages = [];
@@ -348,11 +304,34 @@ async function generarCarnets(opciones = {}) {
 
             if (player) {
                 const rId = `rIdCardPhotoP${pIdx}C${c}`;
-                const photoFilename = `photo_p${pIdx}_c${c}.jpeg`;
-                const key = player.filename || player.filePath;
-                const resized = processedPhotosMap.get(key);
+                const photoFilename = `photo_p${pIdx}_c${c}.png`;
 
-                if (resized) {
+                // Cargar imagen
+                let rawPhoto = player.buffer;
+                if (!rawPhoto && player.filePath && fs.existsSync(player.filePath)) {
+                    rawPhoto = fs.readFileSync(player.filePath);
+                }
+
+                if (rawPhoto) {
+                    // Preprocesar automáticamente: rotación EXIF, recorte de capturas de pantalla o fondos oscuros
+                    const cleanPhoto = await autoPreprocessPhoto(rawPhoto);
+
+                    // Procesar a alta resolución Full HD (800x880) con detección inteligente de rostro (attention) y nitidez optimizada
+                    let resized;
+                    try {
+                        resized = await sharp(cleanPhoto)
+                            .resize(800, 880, { fit: 'cover', position: sharp.strategy.attention, kernel: 'lanczos3' })
+                            .sharpen({ sigma: 1.0, m1: 0.6, m2: 2.0 })
+                            .png({ quality: 100, compressionLevel: 6 })
+                            .toBuffer();
+                    } catch (e) {
+                        resized = await sharp(cleanPhoto)
+                            .resize(800, 880, { fit: 'cover', position: 'center', kernel: 'lanczos3' })
+                            .sharpen({ sigma: 1.0, m1: 0.6, m2: 2.0 })
+                            .png({ quality: 100, compressionLevel: 6 })
+                            .toBuffer();
+                    }
+
                     zip.file(`word/media/${photoFilename}`, resized);
                     relsXml = relsXml.replace(
                         '</Relationships>',
@@ -422,30 +401,31 @@ async function generarCarnets(opciones = {}) {
     fs.writeFileSync(docxPath, docxBuf);
     console.log(`Documento Word generado usando plantilla original: ${docxPath}`);
 
-    // Generar documento PDF oficial de forma nativa (compatible 100% con Windows y Linux Alwaysdata)
-    try {
-        const { generarCarnetsPdf } = require('./generador_pdf.js');
-        await generarCarnetsPdf({
-            salidaPdf: pdfPath,
-            bannerPath: bannerPath || path.join(baseDir, 'banner.png'),
-            jugadores: players,
-            fotosDir
-        });
-        console.log(`Documento PDF generado exitosamente: ${pdfPath}`);
-    } catch (errPdf) {
-        console.warn("Aviso al generar PDF nativo:", errPdf.message);
-        if (process.platform === 'win32') {
-            try {
-                const psScript = path.join(baseDir, 'convert.ps1');
-                execSync(`powershell -ExecutionPolicy Bypass -File "${psScript}" -DocxPath "${docxPath}" -PdfPath "${pdfPath}"`, {
-                    stdio: 'ignore',
-                    timeout: 8000,
-                    windowsHide: true
-                });
-                console.log(`Documento PDF generado con Word COM: ${pdfPath}`);
-            } catch (e) {
-                console.warn("Aviso al convertir con Word COM:", e.message);
-            }
+    // Exportar a PDF (en Windows con Word COM / en Linux Alwaysdata con LibreOffice soffice)
+    if (process.platform === 'win32') {
+        try {
+            const psScript = path.join(baseDir, 'convert.ps1');
+            execSync(`powershell -ExecutionPolicy Bypass -File "${psScript}" -DocxPath "${docxPath}" -PdfPath "${pdfPath}"`, {
+                stdio: 'ignore',
+                windowsHide: true,
+                timeout: 30000
+            });
+            console.log(`Documento PDF generado en horizontal: ${pdfPath}`);
+        } catch (e) {
+            console.warn("Aviso al convertir a PDF con Word COM:", e.message);
+        }
+    } else {
+        try {
+            const sofficeBin = fs.existsSync('/usr/lib/libreoffice/program/soffice')
+                ? '/usr/lib/libreoffice/program/soffice'
+                : 'soffice';
+            execSync(`"${sofficeBin}" --headless --convert-to pdf --outdir "${path.dirname(pdfPath)}" "${docxPath}"`, {
+                stdio: 'ignore',
+                timeout: 35000
+            });
+            console.log(`Documento PDF generado en Linux Alwaysdata: ${pdfPath}`);
+        } catch (e) {
+            console.warn("Aviso al convertir a PDF con LibreOffice:", e.message);
         }
     }
 

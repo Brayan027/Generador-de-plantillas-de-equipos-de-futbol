@@ -50,6 +50,7 @@ function requireAdmin(req, res, next) {
         return next();
     }
 
+    const authHeader = req.headers['authorization'] || '';
     const token = authHeader.startsWith('Bearer ')
         ? authHeader.slice(7).trim()
         : (req.headers['x-admin-token'] || req.query.admin_token || req.query.token);
