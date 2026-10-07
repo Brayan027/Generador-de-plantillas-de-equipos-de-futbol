@@ -422,22 +422,31 @@ async function generarCarnets(opciones = {}) {
     fs.writeFileSync(docxPath, docxBuf);
     console.log(`Documento Word generado usando plantilla original: ${docxPath}`);
 
-    // Exportar a PDF usando Word COM (en Windows) o omitir pacíficamente en Linux
-    if (process.platform === 'win32') {
-        try {
-            const psScript = path.join(baseDir, 'convert.ps1');
-            execSync(`powershell -ExecutionPolicy Bypass -File "${psScript}" -DocxPath "${docxPath}" -PdfPath "${pdfPath}"`, {
-                stdio: 'ignore',
-                timeout: 8000,
-                windowsHide: true
-            });
-            console.log(`Documento PDF generado en horizontal: ${pdfPath}`);
-        } catch (e) {
-            console.warn("Aviso al convertir a PDF:", e.message);
-            try { execSync('taskkill /f /im WINWORD.EXE', { stdio: 'ignore' }); } catch (_) {}
+    // Generar documento PDF oficial de forma nativa (compatible 100% con Windows y Linux Alwaysdata)
+    try {
+        const { generarCarnetsPdf } = require('./generador_pdf.js');
+        await generarCarnetsPdf({
+            salidaPdf: pdfPath,
+            bannerPath: bannerPath || path.join(baseDir, 'banner.png'),
+            jugadores: players,
+            fotosDir
+        });
+        console.log(`Documento PDF generado exitosamente: ${pdfPath}`);
+    } catch (errPdf) {
+        console.warn("Aviso al generar PDF nativo:", errPdf.message);
+        if (process.platform === 'win32') {
+            try {
+                const psScript = path.join(baseDir, 'convert.ps1');
+                execSync(`powershell -ExecutionPolicy Bypass -File "${psScript}" -DocxPath "${docxPath}" -PdfPath "${pdfPath}"`, {
+                    stdio: 'ignore',
+                    timeout: 8000,
+                    windowsHide: true
+                });
+                console.log(`Documento PDF generado con Word COM: ${pdfPath}`);
+            } catch (e) {
+                console.warn("Aviso al convertir con Word COM:", e.message);
+            }
         }
-    } else {
-        console.log("Documento DOCX generado exitosamente (servidor Linux detectado).");
     }
 
     return {
